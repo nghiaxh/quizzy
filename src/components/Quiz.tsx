@@ -75,7 +75,7 @@ export default function Quiz() {
         <div className="h-0.5 bg-primary transition-all duration-500 ease-out" style={{ width: `${progressPct}%` }} />
       </div>
 
-      {/* Question — căn giữa */}
+      {/* Question */}
       <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 py-8">
         <div className="w-full max-w-xl">
           <p className="text-[11px] font-semibold text-primary/60 uppercase tracking-widest mb-3 text-center">Câu {currentIndex + 1}</p>
@@ -97,50 +97,32 @@ export default function Quiz() {
         </div>
       </div>
 
-      {/* Footer */}
+      {/* Footer – only two buttons: Previous and Main Action */}
       <div className="px-6 py-4 border-t border-base-300 bg-base-100">
-        {/* Dot indicators */}
-        <div className="flex gap-1.5 items-center justify-center mb-4 overflow-x-auto">
-          {questions.map((_, i) => {
-            const s = submitted[questions[i].id];
-            const correct = s && answers[questions[i].id] === questions[i].correctIndex;
-            return <div key={i} className={`h-2 rounded-full transition-all duration-300 shrink-0 ${i === currentIndex ? "bg-primary w-6" : s ? (correct ? "bg-success w-2" : "bg-error w-2") : "bg-base-300 w-2"}`} />;
-          })}
-        </div>
-
-        {/* 3 nút to, dễ bấm */}
         <div className="flex items-center justify-center gap-3">
-          {/* Trước */}
-          <button className="flex items-center gap-2 btn btn-md btn-ghost flex-1 max-w-35" onClick={prevQuestion} disabled={currentIndex === 0}>
+          {/* Previous button */}
+          <button className="flex items-center gap-2 btn btn-md btn-ghost" onClick={prevQuestion} disabled={currentIndex === 0}>
             <ChevronLeft size={18} />
             Trước
           </button>
 
-          {/* Kiểm tra / Câu tiếp / Xem kết quả */}
+          {/* Main Action button */}
           {!isSubmitted ? (
-            <button className={`flex items-center gap-2 btn btn-md flex-1 max-w-45 transition-all ${hasChosen ? "btn-primary" : "btn-disabled bg-base-200 text-base-content/25 border-base-200"}`} onClick={() => hasChosen && selectAnswer(q.id, chosen, true)} disabled={!hasChosen}>
+            <button className={`flex items-center gap-2 btn btn-md transition-all ${hasChosen ? "btn-primary" : "btn-disabled bg-base-200 text-base-content/25 border-base-200"}`} onClick={() => hasChosen && selectAnswer(q.id, chosen, true)} disabled={!hasChosen}>
               <CheckSquare size={17} />
               Kiểm tra
             </button>
           ) : isLast ? (
-            // Câu cuối đã submit → nút sang kết quả
-            <button className={`flex items-center gap-2 btn btn-md flex-1 max-w-45lSubmitted ? "btn-success" : "btn-disabled opacity-40"}`} onClick={nextQuestion} disabled={!allSubmitted}>
+            <button className={`flex items-center gap-2 btn btn-md ${allSubmitted ? "btn-primary" : "btn-disabled opacity-40"}`} onClick={nextQuestion} disabled={!allSubmitted}>
               Xem kết quả
               <ChevronRight size={17} />
             </button>
           ) : (
-            // Chưa phải câu cuối → nút tiếp
-            <button className="flex items-center gap-2 btn btn-md btn-outline btn-success flex-1 max-w-45" onClick={nextQuestion}>
+            <button className="flex items-center gap-2 btn btn-md btn-outline btn-success" onClick={nextQuestion}>
               Câu tiếp
               <ChevronRight size={17} />
             </button>
           )}
-
-          {/* Tiếp (skip, không cần submit) */}
-          <button className="flex items-center gap-2 btn btn-md btn-ghost flex-1 max-w-35 justify-end" onClick={nextQuestion} disabled={isLast}>
-            Tiếp
-            <ChevronRight size={18} />
-          </button>
         </div>
       </div>
     </div>

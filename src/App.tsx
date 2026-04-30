@@ -46,7 +46,7 @@ export default function App() {
             const Icon = t.icon;
             const isActive = tab === t.key;
             return (
-              <button key={t.key} onClick={() => !disabled && setTab(t.key)} disabled={disabled} title={disabled ? "Soạn câu hỏi trước" : undefined} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
+              <button key={t.key} onClick={() => !disabled && setTab(t.key)} disabled={disabled} title={disabled ? "Soạn câu hỏi trước" : undefined} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
                 <Icon size={13} />
                 {t.label}
                 {disabled && (
