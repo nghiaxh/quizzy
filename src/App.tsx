@@ -3,6 +3,7 @@ import Editor from "./components/Editor";
 import Quiz from "./components/Quiz";
 import Result from "./components/Result";
 import SettingsModal from "./components/SettingsModal";
+import Titlebar from "./components/Titlebar";
 import { PenLine, ClipboardList, Settings, Lock } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -32,9 +33,12 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-base-100 overflow-hidden">
+      {/* Custom Tauri Titlebar */}
+      <Titlebar />
+
       {showSettings && <SettingsModal theme={theme} setTheme={setTheme} onClose={() => setShowSettings(false)} />}
 
-      {/* Titlebar */}
+      {/* Thanh điều hướng tab */}
       <div className="flex items-center justify-between px-4 py-2 bg-base-200 border-b border-base-300">
         <div className="flex items-center gap-1 bg-base-300/50 rounded-xl p-1">
           {TABS.map((t) => {
@@ -60,6 +64,7 @@ export default function App() {
         </button>
       </div>
 
+      {/* Nội dung chính */}
       <div className="flex flex-1 overflow-hidden">
         {tab === "editor" && <Editor />}
         {tab === "quiz" && <Quiz />}
