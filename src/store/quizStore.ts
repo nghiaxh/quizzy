@@ -1,13 +1,32 @@
 import { create } from "zustand";
+import { persist } from "zustand/middleware";
 import { Question, parseQuestions } from "../utils/parser";
 import { fireCorrect } from "../utils/confetti";
 
-export type Tab = "editor" | "quiz" | "result";
+export type Tab = "exams" | "editor" | "quiz" | "result";
+
+export interface Exam {
+  id: string;
+  name: string;
+  rawText: string;
+  createdAt: number;
+  updatedAt: number;
+}
 
 interface QuizStore {
   tab: Tab;
   setTab: (tab: Tab) => void;
 
+  // Multi-exam management
+  exams: Exam[];
+  activeExamId: string | null;
+  createExam: (name: string, rawText?: string) => string;
+  deleteExam: (id: string) => void;
+  renameExam: (id: string, name: string) => void;
+  duplicateExam: (id: string) => void;
+  selectExam: (id: string) => void;
+
+  // Active exam
   rawText: string;
   setRawText: (text: string) => void;
   questions: Question[];
@@ -53,61 +72,144 @@ B. C++
 *C. Rust
 D. Python`;
 
-export const useQuizStore = create<QuizStore>((set, get) => ({
-  tab: "editor",
-  setTab: (tab) => set({ tab }),
-
+const DEFAULT_EXAM: Exam = {
+  id: "default",
+  name: "Đề mẫu",
   rawText: DEFAULT_TEXT,
-  questions: parseQuestions(DEFAULT_TEXT),
-  setRawText: (text) => set({ rawText: text, questions: parseQuestions(text) }),
+  createdAt: Date.now(),
+  updatedAt: Date.now(),
+};
 
-  currentIndex: 0,
-  answers: {},
-  submitted: {},
+function genId() {
+  return Math.random().toString(36).slice(2, 10);
+}
 
-  selectAnswer: (questionId, optionIndex, confirm) => {
-    const { submitted, questions } = get();
-    if (submitted[questionId]) return;
+export const useQuizStore = create<QuizStore>()(
+  persist(
+    (set, get) => ({
+      tab: "exams",
+      setTab: (tab) => set({ tab }),
 
-    if (!confirm) {
-      set((s) => ({ answers: { ...s.answers, [questionId]: optionIndex } }));
-      return;
-    }
+      exams: [DEFAULT_EXAM],
+      activeExamId: null,
 
-    const q = questions.find((q) => q.id === questionId);
-    if (q && optionIndex === q.correctIndex) fireCorrect();
+      createExam: (name, rawText = "") => {
+        const id = genId();
+        const exam: Exam = {
+          id,
+          name: name.trim() || "Đề mới",
+          rawText,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        set((s) => ({ exams: [...s.exams, exam] }));
+        return id;
+      },
 
-    set((s) => ({
-      answers: { ...s.answers, [questionId]: optionIndex },
-      submitted: { ...s.submitted, [questionId]: true },
-    }));
-  },
+      deleteExam: (id) => {
+        set((s) => {
+          const exams = s.exams.filter((e) => e.id !== id);
+          const activeExamId = s.activeExamId === id ? null : s.activeExamId;
+          return { exams, activeExamId };
+        });
+      },
 
-  nextQuestion: () => {
-    const { currentIndex, questions, submitted } = get();
-    const isLast = currentIndex === questions.length - 1;
+      renameExam: (id, name) => {
+        set((s) => ({
+          exams: s.exams.map((e) => (e.id === id ? { ...e, name: name.trim() || e.name, updatedAt: Date.now() } : e)),
+        }));
+      },
 
-    if (isLast) {
-      // Kiểm tra tất cả đã submit chưa
-      const allSubmitted = questions.every((q) => submitted[q.id]);
-      if (allSubmitted) {
-        set({ tab: "result" });
-      }
-      return;
-    }
+      duplicateExam: (id) => {
+        const exam = get().exams.find((e) => e.id === id);
+        if (!exam) return;
+        const newId = genId();
+        const copy: Exam = {
+          ...exam,
+          id: newId,
+          name: `${exam.name} (bản sao)`,
+          createdAt: Date.now(),
+          updatedAt: Date.now(),
+        };
+        set((s) => ({ exams: [...s.exams, copy] }));
+      },
 
-    set({ currentIndex: currentIndex + 1 });
-  },
+      selectExam: (id) => {
+        const exam = get().exams.find((e) => e.id === id);
+        if (!exam) return;
+        set({
+          activeExamId: id,
+          rawText: exam.rawText,
+          questions: parseQuestions(exam.rawText),
+          currentIndex: 0,
+          answers: {},
+          submitted: {},
+          tab: "editor",
+        });
+      },
 
-  prevQuestion: () => {
-    const { currentIndex } = get();
-    if (currentIndex > 0) set({ currentIndex: currentIndex - 1 });
-  },
+      rawText: DEFAULT_TEXT,
+      questions: parseQuestions(DEFAULT_TEXT),
 
-  resetQuiz: () => set({ currentIndex: 0, answers: {}, submitted: {} }),
+      setRawText: (text) => {
+        const { activeExamId } = get();
+        set((s) => ({
+          rawText: text,
+          questions: parseQuestions(text),
+          exams: s.exams.map((e) => (e.id === activeExamId ? { ...e, rawText: text, updatedAt: Date.now() } : e)),
+        }));
+      },
 
-  score: () => {
-    const { questions, answers, submitted } = get();
-    return questions.filter((q) => submitted[q.id] && answers[q.id] === q.correctIndex).length;
-  },
-}));
+      currentIndex: 0,
+      answers: {},
+      submitted: {},
+
+      selectAnswer: (questionId, optionIndex, confirm) => {
+        const { submitted, questions } = get();
+        if (submitted[questionId]) return;
+
+        if (!confirm) {
+          set((s) => ({ answers: { ...s.answers, [questionId]: optionIndex } }));
+          return;
+        }
+
+        const q = questions.find((q) => q.id === questionId);
+        if (q && optionIndex === q.correctIndex) fireCorrect();
+
+        set((s) => ({
+          answers: { ...s.answers, [questionId]: optionIndex },
+          submitted: { ...s.submitted, [questionId]: true },
+        }));
+      },
+
+      nextQuestion: () => {
+        const { currentIndex, questions, submitted } = get();
+        const isLast = currentIndex === questions.length - 1;
+
+        if (isLast) {
+          const allSubmitted = questions.every((q) => submitted[q.id]);
+          if (allSubmitted) set({ tab: "result" });
+          return;
+        }
+
+        set({ currentIndex: currentIndex + 1 });
+      },
+
+      prevQuestion: () => {
+        const { currentIndex } = get();
+        if (currentIndex > 0) set({ currentIndex: currentIndex - 1 });
+      },
+
+      resetQuiz: () => set({ currentIndex: 0, answers: {}, submitted: {} }),
+
+      score: () => {
+        const { questions, answers, submitted } = get();
+        return questions.filter((q) => submitted[q.id] && answers[q.id] === q.correctIndex).length;
+      },
+    }),
+    {
+      name: "quizzy-storage",
+      partialize: (s) => ({ exams: s.exams }),
+    },
+  ),
+);
