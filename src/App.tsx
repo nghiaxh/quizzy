@@ -4,7 +4,6 @@ import Quiz from "./components/Quiz";
 import Result from "./components/Result";
 import ExamsPage from "./components/ExamsPage";
 import SettingsModal from "./components/SettingsModal";
-import Titlebar from "./components/Titlebar";
 import { PenLine, ClipboardList, Settings, Lock, LibraryBig } from "lucide-react";
 import { useState, useEffect } from "react";
 
@@ -36,8 +35,6 @@ export default function App() {
 
   return (
     <div className="flex flex-col h-screen bg-base-100 overflow-hidden">
-      <Titlebar />
-
       {showSettings && <SettingsModal theme={theme} setTheme={setTheme} onClose={() => setShowSettings(false)} />}
 
       {/* Tab bar */}

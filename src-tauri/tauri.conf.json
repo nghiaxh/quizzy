@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "quizzy",
+  "productName": "Quizzy",
   "version": "0.1.0",
   "identifier": "com.quizzy.app",
   "build": {
@@ -12,10 +12,10 @@
   "app": {
     "windows": [
       {
-        "title": "quizzy",
+        "title": "Quizzy",
         "width": 800,
         "height": 600,
-        "decorations": false
+        "decorations": true
       }
     ],
     "security": {
