@@ -1,7 +1,7 @@
 import { useQuizStore, Exam } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
-import { useState, useRef, useCallback } from "react";
-import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Search } from "lucide-react";
+import { useState, useRef, useCallback, ChangeEvent } from "react";
+import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Search, Download, Upload } from "lucide-react";
 
 function formatDate(ts: number) {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -89,6 +89,26 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
     onClose();
   };
 
+  const handleDownloadExam = () => {
+    const data = {
+      name: exam.name,
+      rawText: exam.rawText,
+      createdAt: exam.createdAt,
+      updatedAt: exam.updatedAt,
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${exam.name}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
@@ -172,23 +192,34 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
           )}
         </div>
 
-        {/* Footer actions */}
-        <div className="px-5 py-4 border-t border-base-300 flex flex-wrap items-center gap-2">
+        <div className="p-3 border-t border-base-300 flex flex-wrap items-center">
           <button className="btn btn-sm btn-ghost" onClick={handleEditStart}>
-            <Pencil size={12} /> Sửa tên
+            <Pencil size={12} className="mr-1" />
+            Sửa tên
           </button>
           <button className="btn btn-sm btn-ghost" onClick={handleDuplicate}>
-            <Copy size={12} /> Nhân bản
+            <Copy size={12} className="mr-1" />
+            Nhân bản
           </button>
           <button className="btn btn-sm btn-ghost text-error" onClick={handleDelete}>
-            <Trash2 size={12} /> Xóa
+            <Trash2 size={12} className="mr-1" />
+            Xóa
           </button>
-          <div className="flex-1" />
+
+          <button className="btn btn-sm btn-ghost" onClick={handleDownloadExam}>
+            <Download size={12} className="mr-1" />
+            Lưu đề
+          </button>
+        </div>
+
+        <div className="flex items-center justify-end p-3 gap-3 flex-wrap">
           <button className="btn btn-sm btn-outline" onClick={handleSelectForEditor}>
-            <BookOpen size={12} /> Soạn đề
+            <BookOpen size={12} className="mr-1" />
+            Soạn đề
           </button>
           <button className={`btn btn-sm ${questions.length > 0 ? "btn-primary" : "btn-disabled opacity-30"}`} onClick={handleSelectForQuiz} disabled={questions.length === 0}>
-            <PlayCircle size={12} /> Ôn tập
+            <PlayCircle size={12} className="mr-1" />
+            Ôn tập
           </button>
         </div>
       </div>
@@ -222,7 +253,7 @@ function NewExamModal({ onClose }: { onClose: () => void }) {
         <div className="p-5 flex flex-col gap-4">
           <div>
             <label className="text-xs font-medium text-base-content/50 mb-1.5 block">Tên đề thi</label>
-            <input autoFocus className="input input-bordered w-full text-sm" placeholder="VD: Đề thi Toán HK1..." value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleCreate(true)} />
+            <input autoFocus className="input input-bordered w-full text-sm" placeholder="Nhập tên đề..." value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleCreate(true)} />
           </div>
           <div className="flex gap-2">
             <button className="flex-1 btn btn-ghost btn-sm" onClick={() => handleCreate(false)}>
@@ -239,27 +270,57 @@ function NewExamModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function ExamsPage() {
-  const { exams, activeExamId } = useQuizStore();
+  const { exams, activeExamId, createExam } = useQuizStore();
   const [showNew, setShowNew] = useState(false);
   const [search, setSearch] = useState("");
   const [detailExamId, setDetailExamId] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = exams.filter((e) => e.name.toLowerCase().includes(search.toLowerCase()));
 
   const detailExam = detailExamId ? (exams.find((e) => e.id === detailExamId) ?? null) : null;
 
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (!json.name || !json.rawText) {
+          alert("File JSON không hợp lệ. Vui lòng kiểm tra lại.");
+          return;
+        }
+        createExam(json.name, json.rawText);
+      } catch (err) {
+        alert("Không thể đọc file JSON. Vui lòng kiểm tra lại.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  };
+
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-base-200">
       {showNew && <NewExamModal onClose={() => setShowNew(false)} />}
       {detailExam && <ExamDetailModal exam={detailExam} onClose={() => setDetailExamId(null)} />}
+      <input type="file" accept=".json" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-5 py-3 bg-base-100 border-b border-base-300">
         <input className="input input-sm input-bordered flex-1 max-w-xs text-xs" placeholder="Tìm đề thi..." value={search} onChange={(e) => setSearch(e.target.value)} />
         <div className="ml-auto flex items-center gap-2">
-          <span className="text-xs text-base-content/40">{exams.length} đề</span>
-          <button className="flex items-center gap-1.5 btn btn-primary btn-sm" onClick={() => setShowNew(true)}>
-            <Plus size={14} />
+          <button className="btn btn-outline btn-sm" onClick={handleImportClick}>
+            <Upload size={13} className="mr-1" />
+            Nhập đề
+          </button>
+          <button className="btn btn-primary btn-sm" onClick={() => setShowNew(true)}>
+            <Plus size={13} className="mr-1" />
             Tạo đề mới
           </button>
         </div>
