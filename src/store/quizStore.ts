@@ -84,6 +84,8 @@ function genId() {
   return Math.random().toString(36).slice(2, 10);
 }
 
+let correctAudio: HTMLAudioElement | null = null;
+
 export const useQuizStore = create<QuizStore>()(
   persist(
     (set, get) => ({
@@ -174,8 +176,17 @@ export const useQuizStore = create<QuizStore>()(
         }
 
         const q = questions.find((q) => q.id === questionId);
-        if (q && optionIndex === q.correctIndex) fireCorrect();
+        const isCorrect = q && optionIndex === q.correctIndex;
 
+        if (isCorrect) {
+          if (!correctAudio) {
+            correctAudio = new Audio("/correct.mp3");
+          }
+          correctAudio.currentTime = 0;
+          correctAudio.play().catch(() => {});
+          fireCorrect();
+        }
+        
         set((s) => ({
           answers: { ...s.answers, [questionId]: optionIndex },
           submitted: { ...s.submitted, [questionId]: true },
