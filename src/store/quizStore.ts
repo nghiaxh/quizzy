@@ -40,7 +40,6 @@ interface QuizStore {
   score: () => number;
 }
 
-
 function genId() {
   return Math.random().toString(36).slice(2, 10);
 }
@@ -141,7 +140,7 @@ export const useQuizStore = create<QuizStore>()(
 
         if (isCorrect) {
           if (!correctAudio) {
-            correctAudio = new Audio("/correct.mp3");
+            correctAudio = new Audio("./correct.mp3");
           }
           correctAudio.currentTime = 0;
           correctAudio.play().catch(() => {});
