@@ -1,11 +1,11 @@
 import { useQuizStore } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
 import { HelpCircle, X, CheckCircle2, Circle } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 const HELP_EXAMPLE = `1. Nội dung câu hỏi
 A. Đáp án A
-*B. Đáp án đúng   ← dấu * = đúng
+*B. Đáp án đúng   ← * = đúng
 C. Đáp án C
 D. Đáp án D`;
 
@@ -21,29 +21,33 @@ A. Google
 C. Microsoft
 D. Netflix`;
 
+// HelpModal nhỏ hơn, responsive, tối ưu mobile
 function HelpModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
-          <div className="flex items-center gap-2">
-            <HelpCircle size={16} className="text-primary" />
-            <span className="font-semibold text-sm">Cách soạn câu hỏi</span>
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-sm max-h-[90vh] flex flex-col overflow-hidden">
+        {/* Header nhỏ hơn */}
+        <div className="flex items-center justify-between px-3 py-3 border-b border-base-300">
+          <div className="flex items-center gap-1.5">
+            <HelpCircle size={14} className="text-primary" />
+            <span className="font-semibold text-xs sm:text-sm">Cách soạn câu hỏi</span>
           </div>
-          <button className="btn btn-ghost btn-sm btn-circle" onClick={onClose}>
-            <X size={14} />
+          <button className="btn btn-ghost btn-xs btn-circle" onClick={onClose}>
+            <X size={12} />
           </button>
         </div>
-        <div className="p-5 flex flex-col gap-5">
+
+        {/* Nội dung cuộn riêng */}
+        <div className="overflow-y-auto p-3 sm:p-4 text-xs space-y-3">
           <div>
-            <p className="text-xs font-semibold text-base-content/40 uppercase tracking-widest mb-2">Cấu trúc</p>
-            <pre className="bg-base-200 rounded-xl px-4 py-3 text-xs leading-6 text-base-content whitespace-pre">{HELP_EXAMPLE}</pre>
+            <p className="text-[10px] sm:text-xs font-semibold text-base-content/40 uppercase tracking-wider mb-1.5">Cấu trúc</p>
+            <pre className="bg-base-200 rounded-lg px-3 py-2 text-xs leading-5 whitespace-pre">{HELP_EXAMPLE}</pre>
           </div>
-          <div></div>
+
           <div>
-            <p className="text-xs font-semibold text-base-content/40 uppercase tracking-widest mb-2">Ví dụ</p>
-            <pre className="bg-base-200 rounded-xl px-4 py-3 text-xs leading-6 text-base-content/70 whitespace-pre">{HELP_SAMPLE}</pre>
+            <p className="text-[10px] sm:text-xs font-semibold text-base-content/40 uppercase tracking-wider mb-1.5">Ví dụ</p>
+            <pre className="bg-base-200 rounded-lg px-3 py-2 text-xs leading-5 text-base-content/70 whitespace-pre">{HELP_SAMPLE}</pre>
           </div>
         </div>
       </div>
@@ -56,28 +60,78 @@ export default function Editor() {
   const [showHelp, setShowHelp] = useState(false);
   const preview = parseQuestions(rawText);
 
+  // Refs cho đồng bộ cuộn
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const syncing = useRef(false);
+
+  // Hàm đồng bộ cuộn từ nguồn sang đích
+  const syncScroll = useCallback((source: HTMLElement, target: HTMLElement) => {
+    const sourceScrollable = source.scrollHeight - source.clientHeight;
+    const targetScrollable = target.scrollHeight - target.clientHeight;
+    if (sourceScrollable <= 0 || targetScrollable <= 0) return;
+
+    const pct = source.scrollTop / sourceScrollable;
+    target.scrollTop = pct * targetScrollable;
+  }, []);
+
+  // Xử lý cuộn textarea -> preview
+  const onTextareaScroll = useCallback(() => {
+    if (syncing.current) return;
+    syncing.current = true;
+    const src = textareaRef.current;
+    const dest = previewRef.current;
+    if (src && dest) syncScroll(src, dest);
+    requestAnimationFrame(() => {
+      syncing.current = false;
+    });
+  }, [syncScroll]);
+
+  // Xử lý cuộn preview -> textarea
+  const onPreviewScroll = useCallback(() => {
+    if (syncing.current) return;
+    syncing.current = true;
+    const src = previewRef.current;
+    const dest = textareaRef.current;
+    if (src && dest) syncScroll(src, dest);
+    requestAnimationFrame(() => {
+      syncing.current = false;
+    });
+  }, [syncScroll]);
+
+  useEffect(() => {
+    const ta = textareaRef.current;
+    const pr = previewRef.current;
+    if (ta) ta.addEventListener("scroll", onTextareaScroll, { passive: true });
+    if (pr) pr.addEventListener("scroll", onPreviewScroll, { passive: true });
+    return () => {
+      if (ta) ta.removeEventListener("scroll", onTextareaScroll);
+      if (pr) pr.removeEventListener("scroll", onPreviewScroll);
+    };
+  }, [onTextareaScroll, onPreviewScroll]);
+
   return (
     <>
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 
       <div className="flex flex-1 overflow-hidden flex-col sm:flex-row">
-        {/* Editor — flex-1 */}
+        {/* Editor */}
         <div className="flex flex-col flex-1 min-w-0">
           <div className="flex items-center justify-between px-4 py-2.5 bg-base-200 border-b border-base-300">
             <span className="text-xs font-medium text-base-content/50">Soạn câu hỏi</span>
-            <div className="flex flex-row gap-1 cursor-pointer" onClick={() => setShowHelp(true)} title="Hướng dẫn">
-              <span className="text-xs font-medium text-base-content/50">Hướng dẫn soạn câu hỏi</span>
+            <div className="flex items-center gap-1 cursor-pointer select-none" onClick={() => setShowHelp(true)} title="Hướng dẫn">
+              <span className="text-xs font-medium text-base-content/50 hidden sm:inline">Hướng dẫn</span>
               <HelpCircle size={15} className="text-base-content/40" />
             </div>
           </div>
 
-          <textarea className="flex-1 p-5 text-sm resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={`1. Câu hỏi của bạn\nA. Sai\n*B. Đúng\nC. Sai\nD. Sai`} />
+          <textarea ref={textareaRef} className="flex-1 p-5 text-sm resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={`1. Câu hỏi của bạn\nA. Sai\n*B. Đúng\nC. Sai\nD. Sai`} />
         </div>
 
         {/* Divider */}
-        <div className="w-px bg-base-300 shrink-0" />
+        <div className="w-px bg-base-300 shrink-0 hidden sm:block" />
 
-        {/* Preview — flex-1 */}
+        {/* Preview */}
         <div className="flex flex-col flex-1 min-w-0 bg-base-200 overflow-hidden">
           <div className="px-4 py-2.5 border-b border-base-300 flex items-center justify-between">
             {preview.length > 0 && (
@@ -88,7 +142,7 @@ export default function Editor() {
             )}
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+          <div ref={previewRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
             {preview.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-2 text-base-content/20">
                 <Circle size={28} />
