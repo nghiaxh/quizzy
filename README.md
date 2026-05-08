@@ -1,7 +1,41 @@
-# Tauri + React + Typescript
+# Quizzy - Ứng dụng tạo & ôn tập trắc nghiệm
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+Quizzy là công cụ soạn đề thi trắc nghiệm, hỗ trợ ôn tập.
 
-## Recommended IDE Setup
+Bạn có thể tạo nhiều đề, chỉnh sửa câu hỏi theo cú pháp đơn giản, làm bài kiểm tra và nhận kết quả chi tiết.
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+## Các tính năng
+
+- **Quản lý nhiều đề thi** – tạo, xóa, đổi tên, nhân bản.
+- **Soạn thảo câu hỏi** với cú pháp rõ ràng, xem trước trực quan.
+- **Đồng bộ cuộn** giữa khung soạn & xem trước.
+- **Tìm kiếm câu hỏi** – lọc theo nội dung hoặc số thứ tự.
+- **Ôn tập** từng câu, kiểm tra ngay, xem đáp án đúng.
+- **Kết quả chi tiết** – số câu đúng/sai, phần trăm, hiệu ứng confetti khi điểm cao.
+- **Xuất / Nhập JSON** – lưu đề thi dưới dạng file JSON, dễ dàng chia sẻ.
+- **Giao diện sáng/tối** (light/dark mode).
+- **Responsive** – hoạt động tốt trên điện thoại và máy tính.
+
+## Công nghệ
+
+- [React](https://react.dev) + TypeScript
+- [Zustand](https://zustand-demo.pmnd.rs) (quản lý state)
+- [Tailwind CSS](https://tailwindcss.com) + [DaisyUI](https://daisyui.com)
+- [canvas-confetti](https://github.com/catdad/canvas-confetti) – hiệu ứng chúc mừng
+- [Vite](https://vitejs.dev) – build tool siêu nhanh
+
+## Phát triển
+
+### Yêu cầu
+
+- Node.js >= 18
+- Rustup, MSVC Buildtools
+
+### Cài đặt
+
+```bash
+git clone https://github.com/your-username/quizzy.git
+cd quizzy
+npm install
+npm run tauri dev
+```
