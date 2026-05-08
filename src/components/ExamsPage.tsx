@@ -1,7 +1,7 @@
 import { useQuizStore, Exam } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
-import { useState, useRef } from "react";
-import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Circle, CheckCircle2 } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Search } from "lucide-react";
 
 function formatDate(ts: number) {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -40,6 +40,20 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
   const inputRef = useRef<HTMLInputElement>(null);
   const questions = parseQuestions(exam.rawText);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [gotoInput, setGotoInput] = useState("");
+
+  const filteredQuestions = questions.filter((q, idx) => q.text.toLowerCase().includes(searchTerm.toLowerCase()) || (idx + 1).toString().includes(searchTerm));
+
+  const handleGoToQuestion = useCallback(() => {
+    const num = parseInt(gotoInput, 10);
+    if (!isNaN(num) && num >= 1 && num <= questions.length) {
+      const el = document.getElementById(`question-${num - 1}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setGotoInput("");
+    }
+  }, [gotoInput, questions.length]);
+
   const handleRename = () => {
     renameExam(exam.id, editName);
     setEditing(false);
@@ -64,7 +78,7 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
   };
 
   const handleDelete = () => {
-    if (confirm("Xác nhân xóa đề này?")) {
+    if (confirm("Xác nhận xóa đề này?")) {
       deleteExam(exam.id);
       onClose();
     }
@@ -78,7 +92,7 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
           <div className="flex-1 min-w-0">
@@ -102,7 +116,15 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
                 </button>
               </div>
             ) : (
-              <h2 className="font-semibold text-base text-base-content truncate">{exam.name}</h2>
+              <div>
+                <div className="text-xs space-y-1">
+                  <h2 className="font-semibold text-base text-base-content truncate">{exam.name}</h2>
+                  <span className="flex items-center gap-1 text-base-content/50">
+                    <FileText size={11} />
+                    {questions.length} câu hỏi
+                  </span>
+                </div>
+              </div>
             )}
           </div>
           <button className="btn btn-ghost btn-sm btn-circle ml-2 shrink-0" onClick={onClose}>
@@ -110,26 +132,37 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
           </button>
         </div>
 
-        {/* Question list */}
+        <div className="flex items-center gap-2 px-5 py-3 border-b border-base-300 bg-base-100">
+          <div className="relative flex-1">
+            <input className="input input-sm input-bordered w-full pl-4 pr-2 text-xs" placeholder="Tìm nội dung câu hỏi..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+          </div>
+          <div className="flex items-center gap-1">
+            <input className="input input-sm input-bordered w-24 text-xs text-center" placeholder="Tìm câu" value={gotoInput} onChange={(e) => setGotoInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleGoToQuestion()} />
+            <button className="btn btn-sm" onClick={handleGoToQuestion}>
+              <span>Tìm</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Danh sách câu hỏi */}
         <div className="flex-1 overflow-y-auto p-5">
-          {questions.length === 0 ? (
+          {filteredQuestions.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-2 text-base-content/30">
-              <Circle size={28} />
-              <span className="text-xs">Chưa có câu hỏi nào</span>
+              <Search size={28} />
+              <span className="text-xs">{searchTerm ? "Không tìm thấy câu hỏi phù hợp" : "Chưa có câu hỏi nào"}</span>
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {questions.map((q, qi) => (
-                <div key={q.id} className="bg-base-200/50 border border-base-300 rounded-xl p-3 text-xs">
+              {filteredQuestions.map((q) => (
+                <div key={q.id} id={`question-${q.id}`} className="bg-base-200/50 border border-base-300 rounded-xl p-3 text-sm scroll-mt-4">
                   <p className="font-semibold mb-2 leading-snug text-base-content">
-                    {qi + 1}. {q.text}
+                    {q.id + 1}. {q.text}
                   </p>
                   <div className="flex flex-col gap-0.5">
                     {q.options.map((o, i) => (
                       <div key={i} className={`flex items-center gap-1.5 px-1.5 py-1 rounded-lg ${i === q.correctIndex ? "bg-success/10 text-success" : "text-base-content/50"}`}>
                         <span className={`w-4 h-4 rounded-full text-[9px] flex items-center justify-center shrink-0 font-bold ${i === q.correctIndex ? "bg-success text-white" : "bg-base-300 text-base-content/40"}`}>{"ABCD"[i]}</span>
                         <span className="truncate">{o}</span>
-                        {i === q.correctIndex && <CheckCircle2 size={10} className="ml-auto text-success shrink-0" />}
                       </div>
                     ))}
                   </div>

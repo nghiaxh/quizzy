@@ -1,11 +1,11 @@
 import { useQuizStore } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
-import { HelpCircle, X, CheckCircle2, Circle } from "lucide-react";
+import { HelpCircle, X, CheckCircle2, Search } from "lucide-react";
 import { useState, useRef, useCallback, useEffect } from "react";
 
 const HELP_EXAMPLE = `1. Nội dung câu hỏi
 A. Đáp án A
-*B. Đáp án đúng   ← * = đúng
+*B. Đáp án đúng
 C. Đáp án C
 D. Đáp án D`;
 
@@ -21,13 +21,11 @@ A. Google
 C. Microsoft
 D. Netflix`;
 
-// HelpModal nhỏ hơn, responsive, tối ưu mobile
 function HelpModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-xs sm:max-w-sm max-h-[90vh] flex flex-col overflow-hidden">
-        {/* Header nhỏ hơn */}
         <div className="flex items-center justify-between px-3 py-3 border-b border-base-300">
           <div className="flex items-center gap-1.5">
             <HelpCircle size={14} className="text-primary" />
@@ -38,7 +36,6 @@ function HelpModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* Nội dung cuộn riêng */}
         <div className="overflow-y-auto p-3 sm:p-4 text-xs space-y-3">
           <div>
             <p className="text-[10px] sm:text-xs font-semibold text-base-content/40 uppercase tracking-wider mb-1.5">Cấu trúc</p>
@@ -60,12 +57,10 @@ export default function Editor() {
   const [showHelp, setShowHelp] = useState(false);
   const preview = parseQuestions(rawText);
 
-  // Refs cho đồng bộ cuộn
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const syncing = useRef(false);
 
-  // Hàm đồng bộ cuộn từ nguồn sang đích
   const syncScroll = useCallback((source: HTMLElement, target: HTMLElement) => {
     const sourceScrollable = source.scrollHeight - source.clientHeight;
     const targetScrollable = target.scrollHeight - target.clientHeight;
@@ -75,7 +70,6 @@ export default function Editor() {
     target.scrollTop = pct * targetScrollable;
   }, []);
 
-  // Xử lý cuộn textarea -> preview
   const onTextareaScroll = useCallback(() => {
     if (syncing.current) return;
     syncing.current = true;
@@ -87,7 +81,6 @@ export default function Editor() {
     });
   }, [syncScroll]);
 
-  // Xử lý cuộn preview -> textarea
   const onPreviewScroll = useCallback(() => {
     if (syncing.current) return;
     syncing.current = true;
@@ -109,6 +102,20 @@ export default function Editor() {
       if (pr) pr.removeEventListener("scroll", onPreviewScroll);
     };
   }, [onTextareaScroll, onPreviewScroll]);
+
+  const [searchPreview, setSearchPreview] = useState("");
+  const [gotoPreview, setGotoPreview] = useState("");
+
+  const filteredPreview = preview.filter((q, idx) => q.text.toLowerCase().includes(searchPreview.toLowerCase()) || (idx + 1).toString().includes(searchPreview));
+
+  const handleGoToQuestion = useCallback(() => {
+    const num = parseInt(gotoPreview, 10);
+    if (!isNaN(num) && num >= 1 && num <= preview.length) {
+      const el = document.getElementById(`preview-q-${num - 1}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+      setGotoPreview("");
+    }
+  }, [gotoPreview, preview.length]);
 
   return (
     <>
@@ -133,9 +140,19 @@ export default function Editor() {
 
         {/* Preview */}
         <div className="flex flex-col flex-1 min-w-0 bg-base-200 overflow-hidden">
-          <div className="px-4 py-2.5 border-b border-base-300 flex items-center justify-between">
+          {/* Header */}
+          <div className="px-4 py-2.5 border-b border-base-300 flex items-center gap-2 flex-wrap">
+            <div className="relative flex-1 min-w-30">
+              <input className="input input-sm input-bordered w-full text-xs" placeholder="Tìm nội dung câu hỏi..." value={searchPreview} onChange={(e) => setSearchPreview(e.target.value)} />
+            </div>
+            <div className="flex items-center gap-1">
+              <input className="input input-sm input-bordered w-24 text-xs text-center" placeholder="Tìm câu" value={gotoPreview} onChange={(e) => setGotoPreview(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleGoToQuestion()} />
+              <button className="btn btn-sm" onClick={handleGoToQuestion}>
+                <span>Tìm</span>
+              </button>
+            </div>
             {preview.length > 0 && (
-              <span className="flex items-center gap-1 text-xs text-success font-medium">
+              <span className="flex items-center gap-1 text-xs text-success font-medium ml-auto">
                 <CheckCircle2 size={12} />
                 {preview.length} câu
               </span>
@@ -143,16 +160,19 @@ export default function Editor() {
           </div>
 
           <div ref={previewRef} className="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
-            {preview.length === 0 ? (
+            {filteredPreview.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full gap-2 text-base-content/20">
-                <Circle size={28} />
-                <span className="text-xs text-center">Chưa có câu hỏi hợp lệ</span>
+                <Search size={28} />
+                <span className="text-xs text-center">{searchPreview ? "Không tìm thấy" : "Chưa có câu hỏi hợp lệ"}</span>
               </div>
             ) : (
-              preview.map((q, qi) => (
-                <div key={q.id} className="bg-base-100 border border-base-300 rounded-xl p-3 text-xs">
+              filteredPreview.map((q) => (
+                <div
+                  key={q.id}
+                  id={`preview-q-${q.id}`}
+                  className="bg-base-100 border border-base-300 rounded-xl p-3 text-sm scroll-mt-4">
                   <p className="font-semibold mb-2 leading-snug text-base-content">
-                    {qi + 1}. {q.text}
+                    {q.id + 1}. {q.text}
                   </p>
                   <div className="flex flex-col gap-0.5">
                     {q.options.map((o, i) => (
