@@ -1,7 +1,7 @@
 import { useQuizStore, Exam } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
 import { useState, useRef } from "react";
-import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, MoreHorizontal, Check, X, FileText, Clock } from "lucide-react";
+import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Circle, CheckCircle2 } from "lucide-react";
 
 function formatDate(ts: number) {
   return new Intl.DateTimeFormat("vi-VN", {
@@ -13,102 +13,12 @@ function formatDate(ts: number) {
   }).format(new Date(ts));
 }
 
-function ExamCard({ exam, onSelect, onEdit }: { exam: Exam; onSelect: () => void; onEdit: () => void }) {
-  const { deleteExam, duplicateExam, renameExam, activeExamId } = useQuizStore();
-  const [showMenu, setShowMenu] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [editName, setEditName] = useState(exam.name);
-  const inputRef = useRef<HTMLInputElement>(null);
+function ExamCard({ exam, onClick, isActive }: { exam: Exam; onClick: () => void; isActive: boolean }) {
   const qCount = parseQuestions(exam.rawText).length;
-  const isActive = activeExamId === exam.id;
-
-  const handleRename = () => {
-    renameExam(exam.id, editName);
-    setEditing(false);
-  };
-
-  const handleEditStart = () => {
-    setEditing(true);
-    setEditName(exam.name);
-    setShowMenu(false);
-    setTimeout(() => inputRef.current?.focus(), 0);
-  };
 
   return (
-    <div className={`group relative bg-base-100 border rounded-2xl p-4 flex flex-col gap-3 transition-all duration-200 hover:shadow-md ${isActive ? "border-primary shadow-sm shadow-primary/10" : "border-base-300 hover:border-base-content/20"}`}>
-      {/* Header */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1 min-w-0">
-          {editing ? (
-            <div className="flex items-center gap-1">
-              <input
-                ref={inputRef}
-                className="input input-xs input-bordered flex-1 text-sm font-semibold"
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") handleRename();
-                  if (e.key === "Escape") setEditing(false);
-                }}
-              />
-              <button className="btn btn-xs btn-ghost btn-circle text-success" onClick={handleRename}>
-                <Check size={12} />
-              </button>
-              <button className="btn btn-xs btn-ghost btn-circle text-error" onClick={() => setEditing(false)}>
-                <X size={12} />
-              </button>
-            </div>
-          ) : (
-            <p className="font-semibold text-sm text-base-content truncate pr-2">{exam.name}</p>
-          )}
-        </div>
-
-        {/* Menu */}
-        <div className="relative shrink-0">
-          <button
-            className="btn btn-xs btn-ghost btn-circle opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowMenu(!showMenu);
-            }}>
-            <MoreHorizontal size={14} />
-          </button>
-
-          {showMenu && (
-            <>
-              <div className="fixed inset-0 z-10" onClick={() => setShowMenu(false)} />
-              <div className="absolute right-0 top-7 z-20 bg-base-100 border border-base-300 rounded-xl shadow-xl overflow-hidden w-36 py-1">
-                <button
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-base-200 transition-colors"
-                  onClick={() => {
-                    handleEditStart();
-                  }}>
-                  <Pencil size={12} /> Đổi tên
-                </button>
-                <button
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs hover:bg-base-200 transition-colors"
-                  onClick={() => {
-                    duplicateExam(exam.id);
-                    setShowMenu(false);
-                  }}>
-                  <Copy size={12} /> Nhân bản
-                </button>
-                <div className="h-px bg-base-300 my-1" />
-                <button
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs text-error hover:bg-error/10 transition-colors"
-                  onClick={() => {
-                    deleteExam(exam.id);
-                    setShowMenu(false);
-                  }}>
-                  <Trash2 size={12} /> Xóa
-                </button>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Stats */}
+    <div className={`bg-base-100 border rounded-2xl p-4 flex flex-col gap-2 cursor-pointer transition-all duration-200 hover:shadow-md ${isActive ? "border-primary shadow-sm shadow-primary/10" : "border-base-300 hover:border-base-content/30"}`} onClick={onClick}>
+      <p className="font-semibold text-sm text-base-content truncate">{exam.name}</p>
       <div className="flex items-center gap-3 text-xs text-base-content/40">
         <span className="flex items-center gap-1">
           <FileText size={11} />
@@ -119,25 +29,136 @@ function ExamCard({ exam, onSelect, onEdit }: { exam: Exam; onSelect: () => void
           {formatDate(exam.updatedAt)}
         </span>
       </div>
+    </div>
+  );
+}
 
-      {/* Actions */}
-      <div className="flex items-center gap-2 pt-1">
-        <button className="flex-1 flex items-center justify-center gap-1.5 btn btn-xs btn-ghost border border-base-300 hover:border-primary hover:text-primary" onClick={onEdit}>
-          <BookOpen size={12} />
-          Soạn thảo
-        </button>
-        <button className={`flex-1 flex items-center justify-center gap-1.5 btn btn-xs ${qCount > 0 ? "btn-primary" : "btn-disabled opacity-30"}`} onClick={qCount > 0 ? onSelect : undefined} disabled={qCount === 0}>
-          <PlayCircle size={12} />
-          Làm bài
-        </button>
-      </div>
+function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void }) {
+  const { deleteExam, duplicateExam, renameExam, selectExam, setTab } = useQuizStore();
+  const [editing, setEditing] = useState(false);
+  const [editName, setEditName] = useState(exam.name);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const questions = parseQuestions(exam.rawText);
 
-      {/* Active badge */}
-      {isActive && (
-        <div className="absolute top-3 right-10">
-          <span className="badge badge-primary badge-xs">Đang chọn</span>
+  const handleRename = () => {
+    renameExam(exam.id, editName);
+    setEditing(false);
+  };
+
+  const handleEditStart = () => {
+    setEditing(true);
+    setEditName(exam.name);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const handleSelectForQuiz = () => {
+    selectExam(exam.id);
+    setTab("quiz");
+    onClose();
+  };
+
+  const handleSelectForEditor = () => {
+    selectExam(exam.id);
+    setTab("editor");
+    onClose();
+  };
+
+  const handleDelete = () => {
+    if (confirm("Xác nhân xóa đề này?")) {
+      deleteExam(exam.id);
+      onClose();
+    }
+  };
+
+  const handleDuplicate = () => {
+    duplicateExam(exam.id);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
+          <div className="flex-1 min-w-0">
+            {editing ? (
+              <div className="flex items-center gap-1">
+                <input
+                  ref={inputRef}
+                  className="input input-sm input-bordered flex-1 text-sm font-semibold"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") handleRename();
+                    if (e.key === "Escape") setEditing(false);
+                  }}
+                />
+                <button className="btn btn-xs btn-ghost btn-circle text-success" onClick={handleRename}>
+                  <Check size={12} />
+                </button>
+                <button className="btn btn-xs btn-ghost btn-circle text-error" onClick={() => setEditing(false)}>
+                  <X size={12} />
+                </button>
+              </div>
+            ) : (
+              <h2 className="font-semibold text-base text-base-content truncate">{exam.name}</h2>
+            )}
+          </div>
+          <button className="btn btn-ghost btn-sm btn-circle ml-2 shrink-0" onClick={onClose}>
+            <X size={16} />
+          </button>
         </div>
-      )}
+
+        {/* Question list */}
+        <div className="flex-1 overflow-y-auto p-5">
+          {questions.length === 0 ? (
+            <div className="flex flex-col items-center justify-center h-full gap-2 text-base-content/30">
+              <Circle size={28} />
+              <span className="text-xs">Chưa có câu hỏi nào</span>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-2">
+              {questions.map((q, qi) => (
+                <div key={q.id} className="bg-base-200/50 border border-base-300 rounded-xl p-3 text-xs">
+                  <p className="font-semibold mb-2 leading-snug text-base-content">
+                    {qi + 1}. {q.text}
+                  </p>
+                  <div className="flex flex-col gap-0.5">
+                    {q.options.map((o, i) => (
+                      <div key={i} className={`flex items-center gap-1.5 px-1.5 py-1 rounded-lg ${i === q.correctIndex ? "bg-success/10 text-success" : "text-base-content/50"}`}>
+                        <span className={`w-4 h-4 rounded-full text-[9px] flex items-center justify-center shrink-0 font-bold ${i === q.correctIndex ? "bg-success text-white" : "bg-base-300 text-base-content/40"}`}>{"ABCD"[i]}</span>
+                        <span className="truncate">{o}</span>
+                        {i === q.correctIndex && <CheckCircle2 size={10} className="ml-auto text-success shrink-0" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer actions */}
+        <div className="px-5 py-4 border-t border-base-300 flex flex-wrap items-center gap-2">
+          <button className="btn btn-sm btn-ghost" onClick={handleEditStart}>
+            <Pencil size={12} /> Sửa tên
+          </button>
+          <button className="btn btn-sm btn-ghost" onClick={handleDuplicate}>
+            <Copy size={12} /> Nhân bản
+          </button>
+          <button className="btn btn-sm btn-ghost text-error" onClick={handleDelete}>
+            <Trash2 size={12} /> Xóa
+          </button>
+          <div className="flex-1" />
+          <button className="btn btn-sm btn-outline" onClick={handleSelectForEditor}>
+            <BookOpen size={12} /> Soạn đề
+          </button>
+          <button className={`btn btn-sm ${questions.length > 0 ? "btn-primary" : "btn-disabled opacity-30"}`} onClick={handleSelectForQuiz} disabled={questions.length === 0}>
+            <PlayCircle size={12} /> Ôn tập
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -185,25 +206,19 @@ function NewExamModal({ onClose }: { onClose: () => void }) {
 }
 
 export default function ExamsPage() {
-  const { exams, selectExam, setTab } = useQuizStore();
+  const { exams, activeExamId } = useQuizStore();
   const [showNew, setShowNew] = useState(false);
   const [search, setSearch] = useState("");
+  const [detailExamId, setDetailExamId] = useState<string | null>(null);
 
   const filtered = exams.filter((e) => e.name.toLowerCase().includes(search.toLowerCase()));
 
-  const handleSelectForQuiz = (id: string) => {
-    selectExam(id);
-    setTab("quiz");
-  };
-
-  const handleSelectForEditor = (id: string) => {
-    selectExam(id);
-    setTab("editor");
-  };
+  const detailExam = detailExamId ? (exams.find((e) => e.id === detailExamId) ?? null) : null;
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden bg-base-200">
       {showNew && <NewExamModal onClose={() => setShowNew(false)} />}
+      {detailExam && <ExamDetailModal exam={detailExam} onClose={() => setDetailExamId(null)} />}
 
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-5 py-3 bg-base-100 border-b border-base-300">
@@ -220,19 +235,14 @@ export default function ExamsPage() {
       {/* Grid */}
       <div className="flex-1 overflow-y-auto p-5">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full gap-3 text-base-content/30">
+          <div className="flex flex-col items-center justify-center h-1/2 gap-3 text-base-content/30">
             <FileText size={36} strokeWidth={1.2} />
             <p className="text-sm font-medium">{search ? "Không tìm thấy đề nào" : "Chưa có đề thi nào"}</p>
-            {!search && (
-              <button className="btn btn-sm btn-primary mt-1" onClick={() => setShowNew(true)}>
-                <Plus size={14} /> Tạo đề đầu tiên
-              </button>
-            )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((exam) => (
-              <ExamCard key={exam.id} exam={exam} onSelect={() => handleSelectForQuiz(exam.id)} onEdit={() => handleSelectForEditor(exam.id)} />
+              <ExamCard key={exam.id} exam={exam} isActive={activeExamId === exam.id} onClick={() => setDetailExamId(exam.id)} />
             ))}
           </div>
         )}

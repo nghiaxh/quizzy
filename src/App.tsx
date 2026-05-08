@@ -9,8 +9,8 @@ import { useState, useEffect } from "react";
 
 const TABS = [
   { key: "exams" as const, label: "Đề thi", icon: LibraryBig },
-  { key: "editor" as const, label: "Editor", icon: PenLine },
-  { key: "quiz" as const, label: "Quiz", icon: ClipboardList },
+  { key: "editor" as const, label: "Chỉnh sửa", icon: PenLine },
+  { key: "quiz" as const, label: "Ôn tập", icon: ClipboardList },
 ] as const;
 
 export default function App() {

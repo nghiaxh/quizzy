@@ -27,10 +27,10 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
               <p className="text-xs text-base-content/40 mt-0.5">Chế độ sáng hoặc tối</p>
             </div>
             <div className="flex items-center bg-base-200 rounded-xl p-1 gap-1">
-              <button onClick={() => setTheme("light")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${theme === "light" ? "bg-base-100 text-base-content shadow-sm" : "text-base-content/40 hover:text-base-content"}`}>
+              <button onClick={() => setTheme("light")} className={`cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${theme === "light" ? "bg-base-100 text-base-content shadow-sm" : "text-base-content/40 hover:text-base-content"}`}>
                 <Sun size={13} /> Sáng
               </button>
-              <button onClick={() => setTheme("dark")} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${theme === "dark" ? "bg-base-100 text-base-content shadow-sm" : "text-base-content/40 hover:text-base-content"}`}>
+              <button onClick={() => setTheme("dark")} className={`cursor-pointer flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${theme === "dark" ? "bg-base-100 text-base-content shadow-sm" : "text-base-content/40 hover:text-base-content"}`}>
                 <Moon size={13} /> Tối
               </button>
             </div>
