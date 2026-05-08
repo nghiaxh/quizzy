@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { fireBig } from "../utils/confetti";
-import { RotateCcw, PenLine, CheckCircle2, XCircle, MinusCircle } from "lucide-react";
+import { RotateCcw, PenLine, CheckCircle2, XCircle } from "lucide-react";
 
 export default function Result() {
   const { questions, submitted, score, resetQuiz, setTab } = useQuizStore();
@@ -9,10 +9,9 @@ export default function Result() {
   const total = questions.length;
   const correct = score();
   const wrong = Object.keys(submitted).length - correct;
-  const skip = total - Object.keys(submitted).length;
   const pct = total ? Math.round((correct / total) * 100) : 0;
 
-  const verdict = pct >= 80 ? { text: "Xuất sắc! 🎉", cls: "text-success" } : pct >= 60 ? { text: "Tốt!", cls: "text-primary" } : pct >= 40 ? { text: "Cần ôn thêm", cls: "text-warning" } : { text: "Cố gắng hơn nhé", cls: "text-error" };
+  const verdict = pct >= 80 ? { text: "Xuất sắc!", cls: "text-success" } : pct >= 60 ? { text: "Tốt!", cls: "text-primary" } : pct >= 40 ? { text: "Cần ôn thêm", cls: "text-warning" } : { text: "Cố gắng hơn nhé", cls: "text-error" };
 
   const circumference = 2 * Math.PI * 54;
   const ringColor = pct >= 80 ? "text-success" : pct >= 60 ? "text-primary" : pct >= 40 ? "text-warning" : "text-error";
@@ -45,7 +44,6 @@ export default function Result() {
         {[
           { label: "Đúng", value: correct, cls: "text-success", bg: "bg-success/10", icon: CheckCircle2 },
           { label: "Sai", value: wrong, cls: "text-error", bg: "bg-error/10", icon: XCircle },
-          { label: "Bỏ qua", value: skip, cls: "text-base-content/40", bg: "bg-base-200", icon: MinusCircle },
         ].map(({ label, value, cls, bg, icon: Icon }) => (
           <div key={label} className={`${bg} rounded-2xl px-8 py-4 text-center`}>
             <Icon size={20} className={`mx-auto mb-1.5 ${cls}`} />

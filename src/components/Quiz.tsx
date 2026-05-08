@@ -17,7 +17,7 @@ function EmptyState() {
 }
 
 export default function Quiz() {
-  const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion, score } = useQuizStore();
+  const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion } = useQuizStore();
 
   if (questions.length === 0) return <EmptyState />;
 
@@ -25,7 +25,6 @@ export default function Quiz() {
   const chosen = answers[q.id];
   const isSubmitted = submitted[q.id];
   const hasChosen = chosen !== undefined;
-  const answeredCount = Object.keys(submitted).length;
   const isLast = currentIndex === questions.length - 1;
   const allSubmitted = questions.every((q) => submitted[q.id]);
   const progressPct = ((currentIndex + 1) / questions.length) * 100;
@@ -53,21 +52,11 @@ export default function Quiz() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-2.5 border-b border-base-300 bg-base-100">
-        <span className="text-xs font-medium text-base-content/40">
+      <div className="flex items-center justify-center gap-3 px-5 py-2.5 border-b border-base-300 bg-base-100">
+        <span className="text-sm font-medium text-base-content/40">
           {currentIndex + 1}
-          <span className="text-base-content/20"> / {questions.length}</span>
+          <span className="text-base-content/50"> / {questions.length}</span>
         </span>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-success" />
-          <span className="text-xs text-base-content/50">{score()} đúng</span>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-base-300" />
-          <span className="text-xs text-base-content/50">
-            {answeredCount}/{questions.length} đã trả lời
-          </span>
-        </div>
       </div>
 
       {/* Progress */}
@@ -78,7 +67,6 @@ export default function Quiz() {
       {/* Question */}
       <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 py-8">
         <div className="w-full max-w-xl">
-          <p className="text-[11px] font-semibold text-primary/60 uppercase tracking-widest mb-3 text-center">Câu {currentIndex + 1}</p>
           <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center">{q.text}</p>
 
           <div className="flex flex-col gap-3">
@@ -86,14 +74,9 @@ export default function Quiz() {
               <div key={i} className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 text-sm transition-all duration-150 ${isSubmitted ? "" : "cursor-pointer"} ${getOptionStyle(i)}`} onClick={() => !isSubmitted && selectAnswer(q.id, i, false)}>
                 <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-all ${getCircleStyle(i)}`}>{LABELS[i]}</span>
                 <span className="flex-1 leading-snug">{o}</span>
-                {isSubmitted && i === q.correctIndex && <span className="text-success shrink-0 text-lg">✓</span>}
-                {isSubmitted && chosen === i && i !== q.correctIndex && <span className="text-error shrink-0 text-lg">✗</span>}
               </div>
             ))}
           </div>
-
-          {/* Feedback */}
-          {isSubmitted && <div className={`mt-5 text-sm px-5 py-3 rounded-2xl font-medium border ${chosen === q.correctIndex ? "bg-success/10 text-success border-success/20" : "bg-error/10 text-error border-error/20"}`}>{chosen === q.correctIndex ? "🎉 Chính xác!" : `✗ Đáp án đúng: ${LABELS[q.correctIndex]}. ${q.options[q.correctIndex]}`}</div>}
         </div>
       </div>
 
