@@ -36,6 +36,9 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
             </div>
           </div>
         </div>
+        <div className="flex justify-center text-xs text-base-content/40 my-4">
+          <span>Quizzy 0.1.0 by Nghia Hoang</span>
+        </div>
       </div>
     </div>
   );
