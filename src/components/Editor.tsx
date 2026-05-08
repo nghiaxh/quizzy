@@ -7,19 +7,27 @@ const HELP_EXAMPLE = `1. Nội dung câu hỏi
 A. Đáp án A
 *B. Đáp án đúng
 C. Đáp án C
+D. Đáp án D
+
+2. Nội dung câu hỏi
+A. Đáp án A
+*B. Đáp án đúng
+C. Đáp án C
 D. Đáp án D`;
 
-const HELP_SAMPLE = `1. Thủ đô của Việt Nam?
-A. TP. Hồ Chí Minh
-*B. Hà Nội
-C. Đà Nẵng
-D. Huế
+const HELP_SAMPLE = `1. Một năm có bao nhiêu tháng?
+A. 9
+B. 11
+*C. 12
+D. 10
 
-2. React do ai phát triển?
-A. Google
-*B. Meta
-C. Microsoft
-D. Netflix`;
+2. Hành tinh nào gần Mặt Trời nhất?
+*A. Sao Thủy
+B. Sao Kim
+C. Trái Đất
+D. Sao Hỏa
+
+`;
 
 function HelpModal({ onClose }: { onClose: () => void }) {
   return (
@@ -127,7 +135,7 @@ export default function Editor() {
           <div className="flex items-center justify-between px-4 py-2.5 bg-base-200 border-b border-base-300">
             <span className="text-xs font-medium text-base-content/50">Soạn câu hỏi</span>
             <div className="flex items-center gap-1 cursor-pointer select-none" onClick={() => setShowHelp(true)} title="Hướng dẫn">
-              <span className="text-xs font-medium text-base-content/50 hidden sm:inline">Hướng dẫn</span>
+              <span className="text-xs font-medium text-base-content/50">Hướng dẫn</span>
               <HelpCircle size={15} className="text-base-content/40" />
             </div>
           </div>

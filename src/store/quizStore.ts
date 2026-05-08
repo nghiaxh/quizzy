@@ -17,7 +17,6 @@ interface QuizStore {
   tab: Tab;
   setTab: (tab: Tab) => void;
 
-  // Multi-exam management
   exams: Exam[];
   activeExamId: string | null;
   createExam: (name: string, rawText?: string) => string;
@@ -26,7 +25,6 @@ interface QuizStore {
   duplicateExam: (id: string) => void;
   selectExam: (id: string) => void;
 
-  // Active exam
   rawText: string;
   setRawText: (text: string) => void;
   questions: Question[];
@@ -42,43 +40,6 @@ interface QuizStore {
   score: () => number;
 }
 
-const DEFAULT_TEXT = `1. Thủ đô của Việt Nam là gì?
-A. Hồ Chí Minh
-*B. Hà Nội
-C. Đà Nẵng
-D. Huế
-
-2. HTTP là viết tắt của?
-A. HyperText Markup Protocol
-*B. HyperText Transfer Protocol
-C. HyperText Transfer Page
-D. High Transfer Protocol
-
-3. React được phát triển bởi?
-A. Google
-B. Microsoft
-*C. Meta (Facebook)
-D. Netflix
-
-4. Zustand dùng để làm gì?
-A. Routing
-*B. State management
-C. Styling
-D. Build tool
-
-5. Tauri dùng ngôn ngữ backend nào?
-A. Go
-B. C++
-*C. Rust
-D. Python`;
-
-const DEFAULT_EXAM: Exam = {
-  id: "default",
-  name: "Đề mẫu",
-  rawText: DEFAULT_TEXT,
-  createdAt: Date.now(),
-  updatedAt: Date.now(),
-};
 
 function genId() {
   return Math.random().toString(36).slice(2, 10);
@@ -92,7 +53,7 @@ export const useQuizStore = create<QuizStore>()(
       tab: "exams",
       setTab: (tab) => set({ tab }),
 
-      exams: [DEFAULT_EXAM],
+      exams: [],
       activeExamId: null,
 
       createExam: (name, rawText = "") => {
@@ -150,8 +111,8 @@ export const useQuizStore = create<QuizStore>()(
         });
       },
 
-      rawText: DEFAULT_TEXT,
-      questions: parseQuestions(DEFAULT_TEXT),
+      rawText: "",
+      questions: parseQuestions(""),
 
       setRawText: (text) => {
         const { activeExamId } = get();
@@ -186,7 +147,7 @@ export const useQuizStore = create<QuizStore>()(
           correctAudio.play().catch(() => {});
           fireCorrect();
         }
-        
+
         set((s) => ({
           answers: { ...s.answers, [questionId]: optionIndex },
           submitted: { ...s.submitted, [questionId]: true },
