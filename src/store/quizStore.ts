@@ -38,6 +38,16 @@ interface QuizStore {
   prevQuestion: () => void;
   resetQuiz: () => void;
   score: () => number;
+
+  shuffleQuestions: boolean;
+  setShuffleQuestions: (shuffle: boolean) => void;
+  soundEnabled: boolean;
+  setSoundEnabled: (enabled: boolean) => void;
+  effectsEnabled: boolean;
+  setEffectsEnabled: (enabled: boolean) => void;
+
+  originalQuestions: Question[];
+  startQuiz: () => void;
 }
 
 function genId() {
@@ -46,11 +56,28 @@ function genId() {
 
 let correctAudio: HTMLAudioElement | null = null;
 
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export const useQuizStore = create<QuizStore>()(
   persist(
     (set, get) => ({
       tab: "exams",
-      setTab: (tab) => set({ tab }),
+      setTab: (tab) => {
+        if (tab === "quiz") {
+          const state = get();
+          if (state.questions.length > 0) {
+            state.startQuiz();
+          }
+        }
+        set({ tab });
+      },
 
       exams: [],
       activeExamId: null,
@@ -99,10 +126,12 @@ export const useQuizStore = create<QuizStore>()(
       selectExam: (id) => {
         const exam = get().exams.find((e) => e.id === id);
         if (!exam) return;
+        const parsedQuestions = parseQuestions(exam.rawText);
         set({
           activeExamId: id,
           rawText: exam.rawText,
-          questions: parseQuestions(exam.rawText),
+          questions: parsedQuestions,
+          originalQuestions: parsedQuestions,
           currentIndex: 0,
           answers: {},
           submitted: {},
@@ -112,12 +141,15 @@ export const useQuizStore = create<QuizStore>()(
 
       rawText: "",
       questions: parseQuestions(""),
+      originalQuestions: parseQuestions(""),
 
       setRawText: (text) => {
         const { activeExamId } = get();
+        const parsedQuestions = parseQuestions(text);
         set((s) => ({
           rawText: text,
-          questions: parseQuestions(text),
+          questions: parsedQuestions,
+          originalQuestions: parsedQuestions,
           exams: s.exams.map((e) => (e.id === activeExamId ? { ...e, rawText: text, updatedAt: Date.now() } : e)),
         }));
       },
@@ -127,7 +159,7 @@ export const useQuizStore = create<QuizStore>()(
       submitted: {},
 
       selectAnswer: (questionId, optionIndex, confirm) => {
-        const { submitted, questions } = get();
+        const { submitted, questions, soundEnabled, effectsEnabled } = get();
         if (submitted[questionId]) return;
 
         if (!confirm) {
@@ -139,12 +171,16 @@ export const useQuizStore = create<QuizStore>()(
         const isCorrect = q && optionIndex === q.correctIndex;
 
         if (isCorrect) {
-          if (!correctAudio) {
-            correctAudio = new Audio("./correct.mp3");
+          if (soundEnabled) {
+            if (!correctAudio) {
+              correctAudio = new Audio("./correct.mp3");
+            }
+            correctAudio.currentTime = 0;
+            correctAudio.play().catch(() => {});
           }
-          correctAudio.currentTime = 0;
-          correctAudio.play().catch(() => {});
-          fireCorrect();
+          if (effectsEnabled) {
+            fireCorrect();
+          }
         }
 
         set((s) => ({
@@ -171,16 +207,48 @@ export const useQuizStore = create<QuizStore>()(
         if (currentIndex > 0) set({ currentIndex: currentIndex - 1 });
       },
 
-      resetQuiz: () => set({ currentIndex: 0, answers: {}, submitted: {} }),
+      resetQuiz: () => {
+        const { originalQuestions, shuffleQuestions } = get();
+        const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
+        set({
+          currentIndex: 0,
+          answers: {},
+          submitted: {},
+          questions: questionsToUse,
+        });
+      },
+
+      startQuiz: () => {
+        const { originalQuestions, shuffleQuestions } = get();
+        const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
+        set({
+          currentIndex: 0,
+          answers: {},
+          submitted: {},
+          questions: questionsToUse,
+        });
+      },
 
       score: () => {
         const { questions, answers, submitted } = get();
         return questions.filter((q) => submitted[q.id] && answers[q.id] === q.correctIndex).length;
       },
+
+      shuffleQuestions: false,
+      setShuffleQuestions: (shuffle) => set({ shuffleQuestions: shuffle }),
+      soundEnabled: true,
+      setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
+      effectsEnabled: true,
+      setEffectsEnabled: (enabled) => set({ effectsEnabled: enabled }),
     }),
     {
       name: "quizzy-storage",
-      partialize: (s) => ({ exams: s.exams }),
+      partialize: (s) => ({
+        exams: s.exams,
+        shuffleQuestions: s.shuffleQuestions,
+        soundEnabled: s.soundEnabled,
+        effectsEnabled: s.effectsEnabled,
+      }),
     },
   ),
 );

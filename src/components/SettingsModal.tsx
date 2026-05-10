@@ -1,4 +1,5 @@
-import { Settings, X, Sun, Moon } from "lucide-react";
+import { Settings, X, Sun, Moon, Shuffle, Volume2, Sparkles } from "lucide-react";
+import { useQuizStore } from "../store/quizStore";
 
 interface SettingsModalProps {
   theme: "light" | "dark";
@@ -7,6 +8,8 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ theme, setTheme, onClose }: SettingsModalProps) {
+  const { shuffleQuestions, setShuffleQuestions, soundEnabled, setSoundEnabled, effectsEnabled, setEffectsEnabled } = useQuizStore();
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
@@ -20,7 +23,8 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
             <X size={14} />
           </button>
         </div>
-        <div className="p-5 flex flex-col gap-4">
+
+        <div className="p-5 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">Giao diện</p>
@@ -35,7 +39,41 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
               </button>
             </div>
           </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Shuffle size={15} className="text-base-content/60" />
+              <div>
+                <p className="text-sm font-medium">Đảo câu hỏi</p>
+                <p className="text-xs text-base-content/40 mt-0.5">Xáo trộn thứ tự câu hỏi khi ôn tập</p>
+              </div>
+            </div>
+            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={shuffleQuestions} onChange={(e) => setShuffleQuestions(e.target.checked)} />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Volume2 size={15} className="text-base-content/60" />
+              <div>
+                <p className="text-sm font-medium">Âm thanh</p>
+                <p className="text-xs text-base-content/40 mt-0.5">Phát âm thanh khi trả lời đúng</p>
+              </div>
+            </div>
+            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={soundEnabled} onChange={(e) => setSoundEnabled(e.target.checked)} />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Sparkles size={15} className="text-base-content/60" />
+              <div>
+                <p className="text-sm font-medium">Hiệu ứng</p>
+                <p className="text-xs text-base-content/40 mt-0.5">Hiệu ứng confetti khi trả lời đúng</p>
+              </div>
+            </div>
+            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={effectsEnabled} onChange={(e) => setEffectsEnabled(e.target.checked)} />
+          </div>
         </div>
+
         <div className="flex justify-center text-xs text-base-content/40 my-4">
           <span>Quizzy 0.1.0 by Nghia Hoang</span>
         </div>
