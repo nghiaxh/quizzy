@@ -4,7 +4,7 @@ import { fireBig } from "../utils/confetti";
 import { RotateCcw, PenLine, CheckCircle2, XCircle } from "lucide-react";
 
 export default function Result() {
-  const { questions, submitted, score, resetQuiz, setTab } = useQuizStore();
+  const { questions, submitted, score, startQuiz, setTab, effectsEnabled } = useQuizStore();
 
   const total = questions.length;
   const correct = score();
@@ -17,8 +17,13 @@ export default function Result() {
   const ringColor = pct >= 80 ? "text-success" : pct >= 60 ? "text-primary" : pct >= 40 ? "text-warning" : "text-error";
 
   useEffect(() => {
-    if (pct >= 80) fireBig();
-  }, []);
+    if (pct >= 80 && effectsEnabled) fireBig();
+  }, [effectsEnabled, pct]);
+
+  const handleRetry = () => {
+    startQuiz();
+    setTab("quiz");
+  };
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-7 p-8">
@@ -55,12 +60,7 @@ export default function Result() {
 
       {/* Actions */}
       <div className="flex gap-2">
-        <button
-          className="flex items-center gap-1.5 btn btn-primary"
-          onClick={() => {
-            resetQuiz();
-            setTab("quiz");
-          }}>
+        <button className="flex items-center gap-1.5 btn btn-primary" onClick={handleRetry}>
           <RotateCcw size={14} />
           Làm lại
         </button>
