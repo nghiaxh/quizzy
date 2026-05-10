@@ -256,11 +256,11 @@ function NewExamModal({ onClose }: { onClose: () => void }) {
             <input autoFocus className="input input-bordered w-full text-sm" placeholder="Nhập tên đề..." value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleCreate(true)} />
           </div>
           <div className="flex gap-2">
-            <button className="flex-1 btn btn-ghost btn-sm" onClick={() => handleCreate(false)}>
-              Tạo
+            <button className="flex-1 btn btn-ghost btn-sm" onClick={onClose}>
+              Hủy
             </button>
             <button className="flex-1 btn btn-primary btn-sm" onClick={() => handleCreate(true)}>
-              Tạo &amp; Soạn
+              Tạo
             </button>
           </div>
         </div>
