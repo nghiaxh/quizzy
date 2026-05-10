@@ -1,4 +1,4 @@
-import { Settings, X, Sun, Moon, Shuffle, Volume2, Sparkles } from "lucide-react";
+import { Settings, X, Sun, Moon } from "lucide-react";
 import { useQuizStore } from "../store/quizStore";
 
 interface SettingsModalProps {
@@ -42,7 +42,6 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Shuffle size={15} className="text-base-content/60" />
               <div>
                 <p className="text-sm font-medium">Đảo câu hỏi</p>
                 <p className="text-xs text-base-content/40 mt-0.5">Xáo trộn thứ tự câu hỏi khi ôn tập</p>
@@ -53,7 +52,6 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Volume2 size={15} className="text-base-content/60" />
               <div>
                 <p className="text-sm font-medium">Âm thanh</p>
                 <p className="text-xs text-base-content/40 mt-0.5">Phát âm thanh khi trả lời đúng</p>
@@ -64,10 +62,9 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Sparkles size={15} className="text-base-content/60" />
               <div>
                 <p className="text-sm font-medium">Hiệu ứng</p>
-                <p className="text-xs text-base-content/40 mt-0.5">Hiệu ứng confetti khi trả lời đúng</p>
+                <p className="text-xs text-base-content/40 mt-0.5">Hiệu ứng khi trả lời đúng</p>
               </div>
             </div>
             <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={effectsEnabled} onChange={(e) => setEffectsEnabled(e.target.checked)} />
@@ -75,7 +72,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
         </div>
 
         <div className="flex justify-center text-xs text-base-content/40 my-4">
-          <span>Quizzy 0.1.0 by Nghia Hoang</span>
+          <span>Quizzy 0.2.0 by Nghia Hoang</span>
         </div>
       </div>
     </div>
