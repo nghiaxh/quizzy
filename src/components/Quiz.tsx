@@ -67,13 +67,13 @@ export default function Quiz() {
       {/* Question */}
       <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 py-8">
         <div className="w-full max-w-xl">
-          <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center">{q.text}</p>
+          <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center whitespace-pre-line">{q.text}</p>
 
           <div className="flex flex-col gap-3">
             {q.options.map((o, i) => (
               <div key={i} className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 text-sm transition-all duration-150 ${isSubmitted ? "" : "cursor-pointer"} ${getOptionStyle(i)}`} onClick={() => !isSubmitted && selectAnswer(q.id, i, false)}>
                 <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-all ${getCircleStyle(i)}`}>{LABELS[i]}</span>
-                <span className="flex-1 leading-snug">{o}</span>
+                <span className="flex-1 leading-snug whitespace-pre-line">{o}</span>
               </div>
             ))}
           </div>

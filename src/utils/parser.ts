@@ -13,30 +13,44 @@ export function parseQuestions(raw: string): Question[] {
     const lines = block
       .trim()
       .split("\n")
-      .filter((l) => l.trim());
+      .filter((l) => l.trim() !== "");
     if (!lines.length) continue;
 
     const qMatch = lines[0].match(/^\d+\.\s+(.+)/);
     if (!qMatch) continue;
 
-    const q: Question = {
-      id: questions.length,
-      text: qMatch[1].trim(),
-      options: [],
-      correctIndex: -1,
-    };
+    let questionText = qMatch[1].trim();
+    const options: string[] = [];
+    let correctIndex = -1;
+    let currentOptionIndex = -1;
 
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
-      const isCorrect = line.startsWith("*");
-      const m = line.replace(/^\*/, "").match(/^([A-D])\.\s+(.+)/);
-      if (!m) continue;
-      if (isCorrect) q.correctIndex = q.options.length;
-      q.options.push(m[2].trim());
+      const optMatch = line.match(/^(\*?)([A-D])\.\s+(.+)/);
+      if (optMatch) {
+        const isCorrect = optMatch[1] === "*";
+        const text = optMatch[3].trim();
+        currentOptionIndex = options.length;
+        options.push(text);
+        if (isCorrect && correctIndex === -1) {
+          correctIndex = currentOptionIndex;
+        }
+      } else {
+        if (currentOptionIndex === -1) {
+          questionText += "\n" + line;
+        } else {
+          options[currentOptionIndex] += "\n" + line;
+        }
+      }
     }
 
-    if (q.options.length >= 2 && q.correctIndex !== -1) {
-      questions.push(q);
+    if (options.length >= 2 && correctIndex !== -1) {
+      questions.push({
+        id: questions.length,
+        text: questionText,
+        options,
+        correctIndex,
+      });
     }
   }
 

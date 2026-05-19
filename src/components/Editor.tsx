@@ -137,14 +137,14 @@ export default function Editor() {
           ) : (
             filteredPreview.map((q) => (
               <div key={q.id} id={`preview-q-${q.id}`} className="bg-base-100 border border-base-300 rounded-xl p-3 text-sm scroll-mt-4">
-                <p className="font-semibold mb-2 leading-snug text-base-content">
+                <p className="font-semibold mb-2 leading-snug text-base-content whitespace-pre-line">
                   {q.id + 1}. {q.text}
                 </p>
                 <div className="flex flex-col gap-0.5">
                   {q.options.map((o, i) => (
                     <div key={i} className={`flex items-center gap-1.5 px-1.5 py-1 rounded-lg ${i === q.correctIndex ? "bg-success/10 text-success" : "text-base-content/40"}`}>
                       <span className={`w-4 h-4 rounded-full text-[9px] flex items-center justify-center shrink-0 font-bold ${i === q.correctIndex ? "bg-success text-white" : "bg-base-300 text-base-content/40"}`}>{"ABCD"[i]}</span>
-                      <span className="truncate">{o}</span>
+                      <span className="whitespace-pre-line">{o}</span>
                     </div>
                   ))}
                 </div>
