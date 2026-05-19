@@ -101,7 +101,7 @@ export default function Editor() {
           </button>
         </div>
 
-        <textarea ref={textareaRef} className="flex-1 p-5 text-sm resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={`1. Câu hỏi của bạn\nA. Sai\n*B. Đúng\nC. Sai\nD. Sai\n\n2. Câu hỏi tiếp theo\n*A. Đúng\nB. Sai\nC. Sai\nD. Sai`} />
+        <textarea ref={textareaRef} className="flex-1 p-5 text-sm font-mono resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={`1. Câu hỏi của bạn\nA. Sai\n*B. Đúng\nC. Sai\nD. Sai\n\n2. Câu hỏi tiếp theo\n*A. Đúng\nB. Sai\nC. Sai\nD. Sai`} />
       </div>
 
       {/* Divider */}
