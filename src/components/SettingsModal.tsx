@@ -8,7 +8,7 @@ interface SettingsModalProps {
 }
 
 export default function SettingsModal({ theme, setTheme, onClose }: SettingsModalProps) {
-  const { shuffleQuestions, setShuffleQuestions, soundEnabled, setSoundEnabled, effectsEnabled, setEffectsEnabled } = useQuizStore();
+  const { shuffleQuestions, setShuffleQuestions, soundEnabled, setSoundEnabled, effectsEnabled, setEffectsEnabled, timerEnabled, setTimerEnabled, timerMinutes, setTimerMinutes } = useQuizStore();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -69,6 +69,29 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
             </div>
             <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={effectsEnabled} onChange={(e) => setEffectsEnabled(e.target.checked)} />
           </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div>
+                <p className="text-sm font-medium">Đồng hồ đếm giờ</p>
+                <p className="text-xs text-base-content/40 mt-0.5">Tự động nộp bài khi hết giờ</p>
+              </div>
+            </div>
+            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={timerEnabled} onChange={(e) => setTimerEnabled(e.target.checked)} />
+          </div>
+
+          {timerEnabled && (
+            <div className="flex items-center justify-between pl-4 border-l-2 border-primary/30">
+              <div>
+                <p className="text-sm font-medium">Thời gian</p>
+                <p className="text-xs text-base-content/40 mt-0.5">Số phút làm bài</p>
+              </div>
+              <div className="flex items-center gap-1">
+                <input type="number" className="input input-sm input-bordered w-20 text-center text-sm" min={1} max={180} value={timerMinutes} onChange={(e) => setTimerMinutes(Math.max(1, parseInt(e.target.value) || 1))} />
+                <span className="text-xs text-base-content/40">phút</span>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-center text-xs text-base-content/40 my-4">

@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { Question, parseQuestions } from "../utils/parser";
 import { fireCorrect } from "../utils/confetti";
 
-export type Tab = "exams" | "editor" | "quiz" | "result";
+export type Tab = "exams" | "editor" | "quiz" | "result" | "review";
 
 export interface Exam {
   id: string;
@@ -48,6 +48,13 @@ interface QuizStore {
 
   originalQuestions: Question[];
   startQuiz: () => void;
+
+  timerEnabled: boolean;
+  setTimerEnabled: (enabled: boolean) => void;
+  timerMinutes: number;
+  setTimerMinutes: (minutes: number) => void;
+  quizEndTime: number | null;
+  submitAllAndFinish: () => void;
 }
 
 function genId() {
@@ -219,13 +226,32 @@ export const useQuizStore = create<QuizStore>()(
       },
 
       startQuiz: () => {
-        const { originalQuestions, shuffleQuestions } = get();
+        const { originalQuestions, shuffleQuestions, timerEnabled, timerMinutes } = get();
         const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
         set({
           currentIndex: 0,
           answers: {},
           submitted: {},
           questions: questionsToUse,
+          quizEndTime: timerEnabled ? Date.now() + timerMinutes * 60 * 1000 : null,
+        });
+      },
+
+      submitAllAndFinish: () => {
+        const { questions, answers } = get();
+        const newAnswers = { ...answers };
+        const newSubmitted: Record<number, boolean> = {};
+        for (const q of questions) {
+          if (newAnswers[q.id] === undefined) {
+            newAnswers[q.id] = 0;
+          }
+          newSubmitted[q.id] = true;
+        }
+        set({
+          answers: newAnswers,
+          submitted: newSubmitted,
+          tab: "result",
+          quizEndTime: null,
         });
       },
 
@@ -240,6 +266,12 @@ export const useQuizStore = create<QuizStore>()(
       setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
       effectsEnabled: true,
       setEffectsEnabled: (enabled) => set({ effectsEnabled: enabled }),
+
+      timerEnabled: false,
+      setTimerEnabled: (enabled) => set({ timerEnabled: enabled }),
+      timerMinutes: 10,
+      setTimerMinutes: (minutes) => set({ timerMinutes: minutes }),
+      quizEndTime: null,
     }),
     {
       name: "quizzy-storage",
@@ -248,6 +280,8 @@ export const useQuizStore = create<QuizStore>()(
         shuffleQuestions: s.shuffleQuestions,
         soundEnabled: s.soundEnabled,
         effectsEnabled: s.effectsEnabled,
+        timerEnabled: s.timerEnabled,
+        timerMinutes: s.timerMinutes,
       }),
     },
   ),
