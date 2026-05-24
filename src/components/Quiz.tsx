@@ -1,7 +1,14 @@
+import { useEffect, useState } from "react";
 import { useQuizStore } from "../store/quizStore";
-import { ChevronLeft, ChevronRight, CheckSquare } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckSquare, Timer } from "lucide-react";
 
 const LABELS = ["A", "B", "C", "D"];
+
+function formatTime(s: number) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+}
 
 function EmptyState() {
   return (
@@ -17,7 +24,72 @@ function EmptyState() {
 }
 
 export default function Quiz() {
-  const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion } = useQuizStore();
+  const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion, quizEndTime, submitAllAndFinish } = useQuizStore();
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!quizEndTime) {
+      setTimeLeft(null);
+      return;
+    }
+    const tick = () => {
+      const remaining = Math.max(0, Math.floor((quizEndTime - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      if (remaining <= 0) submitAllAndFinish();
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [quizEndTime, submitAllAndFinish]);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const state = useQuizStore.getState();
+      if (state.questions.length === 0) return;
+      const q = state.questions[state.currentIndex];
+      const chosen = state.answers[q.id];
+      const isSubmitted = state.submitted[q.id];
+      const hasChosen = chosen !== undefined;
+
+      if (e.key >= "1" && e.key <= "4") {
+        const idx = parseInt(e.key) - 1;
+        if (idx < q.options.length && !isSubmitted) {
+          state.selectAnswer(q.id, idx, false);
+        }
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "Enter") {
+        if (!isSubmitted && hasChosen) {
+          state.selectAnswer(q.id, chosen, true);
+        } else if (isSubmitted) {
+          state.nextQuestion();
+        }
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "ArrowLeft") {
+        state.prevQuestion();
+        e.preventDefault();
+        return;
+      }
+
+      if (e.key === "ArrowRight") {
+        if (!isSubmitted && hasChosen) {
+          state.selectAnswer(q.id, chosen, true);
+        } else if (isSubmitted) {
+          state.nextQuestion();
+        }
+        e.preventDefault();
+        return;
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   if (questions.length === 0) return <EmptyState />;
 
@@ -52,11 +124,20 @@ export default function Quiz() {
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-center gap-3 px-5 py-2.5 border-b border-base-300 bg-base-100">
+      <div className="flex items-center justify-between px-5 py-2.5 border-b border-base-300 bg-base-100">
+        <div>
+          {timeLeft !== null && (
+            <span className={`flex items-center gap-1 text-sm font-medium ${timeLeft <= 60 ? "text-error" : "text-base-content/60"}`}>
+              <Timer size={14} />
+              {formatTime(timeLeft)}
+            </span>
+          )}
+        </div>
         <span className="text-sm font-medium text-base-content/40">
           {currentIndex + 1}
           <span className="text-base-content/50"> / {questions.length}</span>
         </span>
+        <div />
       </div>
 
       {/* Progress */}
@@ -80,16 +161,14 @@ export default function Quiz() {
         </div>
       </div>
 
-      {/* Footer – only two buttons: Previous and Main Action */}
+      {/* Footer */}
       <div className="px-6 py-4 border-t border-base-300 bg-base-100">
         <div className="flex items-center justify-center gap-3">
-          {/* Previous button */}
           <button className="flex items-center gap-2 btn btn-md btn-ghost" onClick={prevQuestion} disabled={currentIndex === 0}>
             <ChevronLeft size={18} />
             Trước
           </button>
 
-          {/* Main Action button */}
           {!isSubmitted ? (
             <button className={`flex items-center gap-2 btn btn-md transition-all ${hasChosen ? "btn-primary" : "btn-disabled bg-base-200 text-base-content/25 border-base-200"}`} onClick={() => hasChosen && selectAnswer(q.id, chosen, true)} disabled={!hasChosen}>
               <CheckSquare size={17} />
