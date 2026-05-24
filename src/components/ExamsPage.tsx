@@ -290,15 +290,28 @@ export default function ExamsPage() {
 
     const reader = new FileReader();
     reader.onload = (event) => {
-      try {
-        const json = JSON.parse(event.target?.result as string);
-        if (!json.name || !json.rawText) {
-          alert("File JSON không hợp lệ. Vui lòng kiểm tra lại.");
+      const content = event.target?.result as string;
+      const fileName = file.name;
+
+      if (fileName.endsWith(".json")) {
+        try {
+          const json = JSON.parse(content);
+          if (!json.name || !json.rawText) {
+            alert("File JSON không hợp lệ. Vui lòng kiểm tra lại.");
+            return;
+          }
+          createExam(json.name, json.rawText);
+        } catch {
+          alert("Không thể đọc file JSON. Vui lòng kiểm tra lại.");
+        }
+      } else if (fileName.endsWith(".txt")) {
+        const name = fileName.replace(/\.txt$/i, "");
+        const parsed = parseQuestions(content);
+        if (parsed.length === 0) {
+          alert("File .txt không chứa câu hỏi hợp lệ.");
           return;
         }
-        createExam(json.name, json.rawText);
-      } catch (err) {
-        alert("Không thể đọc file JSON. Vui lòng kiểm tra lại.");
+        createExam(name, content);
       }
     };
     reader.readAsText(file);
@@ -309,7 +322,7 @@ export default function ExamsPage() {
     <div className="flex flex-col flex-1 overflow-hidden bg-base-200">
       {showNew && <NewExamModal onClose={() => setShowNew(false)} />}
       {detailExam && <ExamDetailModal exam={detailExam} onClose={() => setDetailExamId(null)} />}
-      <input type="file" accept=".json" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
+      <input type="file" accept=".json,.txt" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 
       {/* Toolbar */}
       <div className="flex items-center gap-3 px-5 py-3 bg-base-100 border-b border-base-300">
