@@ -3,23 +3,17 @@ import { parseQuestions } from "../utils/parser";
 import { CheckCircle2, Search, FileText } from "lucide-react";
 import { useState, useRef, useCallback, useEffect } from "react";
 
-const SAMPLE_EXAM = `1. Nội dung câu hỏi
-*A. Đáp án đúng
-B. Đáp án B
-C. Đáp án C
-D. Đáp án D
+const CORRECT_LABELS = ["A", "B", "C", "D"];
 
-2. Nội dung câu hỏi
-A. Đáp án A
-*B. Đáp án đúng
-C. Đáp án C
-D. Đáp án D
+function makeSampleQuestion(n: number) {
+  const correctIdx = (n - 1) % 4;
+  const options = CORRECT_LABELS.map((label, i) =>
+    `${i === correctIdx ? "*" : ""}${label}. Đáp án ${label}`
+  );
+  return `${n}. Nội dung câu hỏi\n${options.join("\n")}`;
+}
 
-3. Nội dung câu hỏi
-A. Đáp án A
-B. Đáp án B
-*C. Đáp án đúng
-D. Đáp án D`;
+const SAMPLE_EXAM = Array.from({ length: 10 }, (_, i) => makeSampleQuestion(i + 1)).join("\n\n");
 
 export default function Editor() {
   const { rawText, setRawText } = useQuizStore();
@@ -85,6 +79,11 @@ export default function Editor() {
     }
   }, [gotoPreview, preview.length]);
 
+  const handleAddSample = () => {
+    const next = preview.length + 1;
+    setRawText(rawText ? `${rawText}\n\n${makeSampleQuestion(next)}` : makeSampleQuestion(next));
+  };
+
   const handleLoadSample = () => {
     setRawText(SAMPLE_EXAM);
   };
@@ -95,10 +94,16 @@ export default function Editor() {
       <div className="flex flex-col flex-1 min-w-0">
         <div className="flex items-center justify-between px-4 py-2.5 bg-base-200 border-b border-base-300">
           <span className="text-xs font-medium text-base-content/50">Soạn câu hỏi</span>
-          <button className="btn btn-xs btn-ghost text-primary flex items-center gap-1" onClick={handleLoadSample} title="Tạo đề mẫu">
-            <FileText size={13} />
-            <span className="text-xs">Tạo đề mẫu</span>
-          </button>
+          <div className="flex items-center gap-1">
+            <button className="btn btn-xs btn-ghost text-secondary flex items-center gap-1" onClick={handleAddSample} title="Thêm câu hỏi mẫu">
+              <FileText size={13} />
+              <span className="text-xs">Thêm câu mẫu</span>
+            </button>
+            <button className="btn btn-xs btn-ghost text-primary flex items-center gap-1" onClick={handleLoadSample} title="Tạo đề mẫu">
+              <FileText size={13} />
+              <span className="text-xs">Tạo đề mẫu</span>
+            </button>
+          </div>
         </div>
 
         <textarea ref={textareaRef} className="flex-1 p-5 text-sm font-mono resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={`1. Câu hỏi của bạn\nA. Sai\n*B. Đúng\nC. Sai\nD. Sai\n\n2. Câu hỏi tiếp theo\n*A. Đúng\nB. Sai\nC. Sai\nD. Sai`} />
