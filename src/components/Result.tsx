@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { fireBig } from "../utils/confetti";
-import { RotateCcw, PenLine, CheckCircle2, XCircle } from "lucide-react";
+import { RotateCcw, PenLine, CheckCircle2, XCircle, Eye } from "lucide-react";
 
 export default function Result() {
   const { questions, submitted, score, startQuiz, setTab, effectsEnabled } = useQuizStore();
@@ -58,11 +58,14 @@ export default function Result() {
         ))}
       </div>
 
-      {/* Actions */}
       <div className="flex gap-2">
         <button className="flex items-center gap-1.5 btn btn-primary" onClick={handleRetry}>
           <RotateCcw size={14} />
           Làm lại
+        </button>
+        <button className="flex items-center gap-1.5 btn btn-outline" onClick={() => setTab("review")}>
+          <Eye size={14} />
+          Xem lại
         </button>
         <button className="flex items-center gap-1.5 btn btn-ghost" onClick={() => setTab("editor")}>
           <PenLine size={14} />

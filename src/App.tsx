@@ -2,6 +2,7 @@ import { useQuizStore } from "./store/quizStore";
 import Editor from "./components/Editor";
 import Quiz from "./components/Quiz";
 import Result from "./components/Result";
+import Review from "./components/Review";
 import ExamsPage from "./components/ExamsPage";
 import SettingsModal from "./components/SettingsModal";
 import { PenLine, ClipboardList, Settings, Lock, LibraryBig } from "lucide-react";
@@ -66,6 +67,7 @@ export default function App() {
         {tab === "editor" && <Editor />}
         {tab === "quiz" && <Quiz />}
         {tab === "result" && <Result />}
+        {tab === "review" && <Review />}
       </div>
     </div>
   );
