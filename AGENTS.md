@@ -70,3 +70,26 @@ Quiz-in-progress state (`currentIndex`, `answers`, `submitted`, `tab`) is **not*
 
 - There are two distinct `Question` types: `src/types.ts` (`id: string`, `options: Option[]`) and `src/utils/parser.ts` (`id: number`, `options: string[]`). The parser's type is the runtime source of truth.
 - Tauri build requires Rust toolchain + MSVC Buildtools (Windows). For headless/CI web builds, `npm run build` alone suffices.
+
+## Git commit convention
+
+Use [Conventional Commits](https://www.conventionalcommits.org/):
+
+```
+<type>(<scope>): <description>
+```
+
+Types: `feat`, `fix`, `docs`, `refactor`, `chore`, `style`, `perf`, `test`, `ci`, `build`.
+
+- `feat` — new feature
+- `fix` — bug fix
+- `docs` — documentation changes
+- `refactor` — code refactoring (no behavior change)
+- `chore` — maintenance, dependencies, config
+- `style` — code formatting, CSS
+- `ci` — CI/CD
+- `build` — build system
+
+Scope (optional) is the affected file/directory. E.g. `feat(editor):`, `fix(quiz):`, `chore(deps):`.
+
+Write descriptions in English, present tense, lowercase, no trailing period.
