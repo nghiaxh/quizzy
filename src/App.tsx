@@ -38,6 +38,17 @@ export default function App() {
   const syncingRef = useRef(false);
   const initializedRef = useRef(false);
 
+  const driveSyncStatus = useQuizStore((s) => s.driveSyncStatus);
+  useEffect(() => {
+    if (driveSyncStatus === "success" || driveSyncStatus === "error") {
+      const timer = setTimeout(
+        () => useQuizStore.getState().setDriveSyncStatus("idle"),
+        3000,
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [driveSyncStatus]);
+
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
