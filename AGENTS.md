@@ -4,7 +4,7 @@
 
 ```bash
 npm install            # install JS deps
-npm run dev            # Vite dev server on port 1420
+npm run dev            # Vite dev server on port 5173
 npm run build          # tsc && vite build (type-check first, then bundle)
 npm run preview        # Vite preview of built dist/
 ```
@@ -39,7 +39,7 @@ D. Wrong answer
 
 ## Vite quirks
 
-- Dev server runs on port 1420
+- Dev server runs on port 5173 (Vite default)
 - `tsconfig.node.json` is a project reference for `vite.config.ts` only
 - `tsc` must succeed before Vite bundles (no separate type-check command)
 
