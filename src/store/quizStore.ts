@@ -63,7 +63,7 @@ interface QuizStore {
   driveSyncStatus: "idle" | "syncing" | "success" | "error";
   loginLoading: boolean;
   setDriveState: (connected: boolean, email?: string) => void;
-  setLastSyncAt: (ts: number) => void;
+  setLastSyncAt: (ts: number | null) => void;
   setDriveSyncStatus: (status: "idle" | "syncing" | "success" | "error") => void;
   setLoginLoading: (loading: boolean) => void;
   pruneTombstones: () => void;
@@ -118,7 +118,7 @@ export const useQuizStore = create<QuizStore>()(
         const now = Date.now();
         set((s) => ({
           exams: s.exams.map((e) =>
-            e.id === id ? { ...e, deletedAt: now } : e,
+            e.id === id ? { ...e, deletedAt: now, updatedAt: now } : e,
           ),
           activeExamId: s.activeExamId === id ? null : s.activeExamId,
         }));
@@ -306,7 +306,7 @@ export const useQuizStore = create<QuizStore>()(
       driveSyncStatus: "idle",
       loginLoading: false,
       setDriveState: (connected, email) => set({ driveConnected: connected, driveEmail: email ?? null }),
-      setLastSyncAt: (ts: number) => set({ lastSyncAt: ts }),
+      setLastSyncAt: (ts: number | null) => set({ lastSyncAt: ts }),
       setDriveSyncStatus: (status) => set({ driveSyncStatus: status }),
       setLoginLoading: (loading) => set({ loginLoading: loading }),
       pruneTombstones: () => {
