@@ -5,7 +5,7 @@ import Result from "./components/Result";
 import Review from "./components/Review";
 import ExamsPage from "./components/ExamsPage";
 import SettingsModal from "./components/SettingsModal";
-import { PenLine, ClipboardList, Settings, Lock, LibraryBig, Cloud, Loader2 } from "lucide-react";
+import { PenLine, ClipboardList, Settings, LibraryBig, Cloud, Loader2 } from "lucide-react";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { initDriveClient, signIn, tryRestoreToken, tryRefreshToken, orchestrateSync, isSignedIn, getBackupMetadata } from "./utils/googleDrive";
 
@@ -210,7 +210,6 @@ export default function App() {
               <button key={t.key} onClick={() => !disabled && setTab(t.key)} disabled={disabled} title={t.key === "editor" && disabled ? "Chọn đề thi trước" : t.key === "quiz" && disabled ? "Soạn câu hỏi trước" : undefined} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
                 <Icon size={13} />
                 {t.label}
-                {disabled && <Lock size={11} className="opacity-30" />}
               </button>
             );
           })}
