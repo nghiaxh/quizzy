@@ -11,6 +11,7 @@ export interface Exam {
   rawText: string;
   createdAt: number;
   updatedAt: number;
+  deletedAt?: number;
 }
 
 interface QuizStore {
@@ -55,6 +56,17 @@ interface QuizStore {
   setTimerMinutes: (minutes: number) => void;
   quizEndTime: number | null;
   submitAllAndFinish: () => void;
+
+  driveConnected: boolean;
+  driveEmail: string | null;
+  lastSyncAt: number | null;
+  driveSyncStatus: "idle" | "syncing" | "success" | "error";
+  loginLoading: boolean;
+  setDriveState: (connected: boolean, email?: string) => void;
+  setLastSyncAt: (ts: number) => void;
+  setDriveSyncStatus: (status: "idle" | "syncing" | "success" | "error") => void;
+  setLoginLoading: (loading: boolean) => void;
+  pruneTombstones: () => void;
 }
 
 function genId() {
@@ -103,11 +115,13 @@ export const useQuizStore = create<QuizStore>()(
       },
 
       deleteExam: (id) => {
-        set((s) => {
-          const exams = s.exams.filter((e) => e.id !== id);
-          const activeExamId = s.activeExamId === id ? null : s.activeExamId;
-          return { exams, activeExamId };
-        });
+        const now = Date.now();
+        set((s) => ({
+          exams: s.exams.map((e) =>
+            e.id === id ? { ...e, deletedAt: now } : e,
+          ),
+          activeExamId: s.activeExamId === id ? null : s.activeExamId,
+        }));
       },
 
       renameExam: (id, name) => {
@@ -126,6 +140,7 @@ export const useQuizStore = create<QuizStore>()(
           name: `${exam.name} (bản sao)`,
           createdAt: Date.now(),
           updatedAt: Date.now(),
+          deletedAt: undefined,
         };
         set((s) => ({ exams: [...s.exams, copy] }));
       },
@@ -272,6 +287,35 @@ export const useQuizStore = create<QuizStore>()(
       timerMinutes: 10,
       setTimerMinutes: (minutes) => set({ timerMinutes: minutes }),
       quizEndTime: null,
+
+      driveConnected: (() => {
+        try {
+          return JSON.parse(localStorage.getItem("quizzy-storage") || "{}")?.state?.driveConnected ?? false;
+        } catch { return false; }
+      })(),
+      driveEmail: (() => {
+        try {
+          return JSON.parse(localStorage.getItem("quizzy-storage") || "{}")?.state?.driveEmail ?? null;
+        } catch { return null; }
+      })(),
+      lastSyncAt: (() => {
+        try {
+          return JSON.parse(localStorage.getItem("quizzy-storage") || "{}")?.state?.lastSyncAt ?? null;
+        } catch { return null; }
+      })(),
+      driveSyncStatus: "idle",
+      loginLoading: false,
+      setDriveState: (connected, email) => set({ driveConnected: connected, driveEmail: email ?? null }),
+      setLastSyncAt: (ts: number) => set({ lastSyncAt: ts }),
+      setDriveSyncStatus: (status) => set({ driveSyncStatus: status }),
+      setLoginLoading: (loading) => set({ loginLoading: loading }),
+      pruneTombstones: () => {
+        set((s) => {
+          const active = s.exams.filter((e) => !e.deletedAt);
+          if (active.length === s.exams.length) return {};
+          return { exams: active };
+        });
+      },
     }),
     {
       name: "quizzy-storage",
@@ -282,6 +326,9 @@ export const useQuizStore = create<QuizStore>()(
         effectsEnabled: s.effectsEnabled,
         timerEnabled: s.timerEnabled,
         timerMinutes: s.timerMinutes,
+        driveConnected: s.driveConnected,
+        driveEmail: s.driveEmail,
+        lastSyncAt: s.lastSyncAt,
       }),
     },
   ),
