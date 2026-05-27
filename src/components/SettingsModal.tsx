@@ -23,10 +23,10 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
   const { shuffleQuestions, setShuffleQuestions, soundEnabled, setSoundEnabled, effectsEnabled, setEffectsEnabled, timerEnabled, setTimerEnabled, timerMinutes, setTimerMinutes, driveConnected, driveEmail, lastSyncAt, driveSyncStatus, loginLoading, setDriveState, setLastSyncAt, setDriveSyncStatus, setLoginLoading, pruneTombstones, exams } = useQuizStore();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm max-h-[85vh] flex flex-col overflow-hidden">
+        <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-base-300 sticky top-0 bg-base-100 z-10">
           <div className="flex items-center gap-2">
             <Settings size={15} className="text-primary" />
             <span className="font-semibold text-sm">Cài đặt</span>
@@ -36,7 +36,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
           </button>
         </div>
 
-        <div className="p-5 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-5 flex flex-col gap-5 sm:gap-6 pb-8 sm:pb-2 overscroll-contain">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium">Giao diện</p>
@@ -205,7 +205,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
           </div>
         </div>
 
-        <div className="flex justify-center text-xs text-base-content/40 my-4">
+        <div className="flex justify-center text-xs text-base-content/40 py-3 sm:py-4">
           <span>Quizzy 0.4.0 by Nghia Hoang</span>
         </div>
       </div>
