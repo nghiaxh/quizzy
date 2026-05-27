@@ -6,7 +6,6 @@
 npm install            # install JS deps
 npm run dev            # Vite dev server on port 1420
 npm run build          # tsc && vite build (type-check first, then bundle)
-npm run tauri dev      # Tauri desktop app (also runs `npm run dev`)
 npm run preview        # Vite preview of built dist/
 ```
 
@@ -18,20 +17,7 @@ No linter, no test framework, no typecheck script. `npm run build` = the only CI
 - Vite 7 + `@vitejs/plugin-react`
 - Tailwind CSS 4 (`@import "tailwindcss"` in `index.css`) + DaisyUI 5 (`@plugin "daisyui"`)
 - State: Zustand 5 with `persist` middleware → `localStorage` key `quizzy-storage`
-- Desktop: Tauri 2 (Rust backend—minimal, only `tauri` + `tauri-plugin-opener`)
 - CI: GitHub Pages deploy via `npm run build` on push to `main`
-
-## Architecture
-
-Single-page app with 4 tabs (`exams | editor | quiz | result`), all backed by one Zustand store at `src/store/quizStore.ts`.
-
-| Directory | Purpose |
-|-----------|---------|
-| `src/components/` | 5 components: `ExamsPage`, `Editor`, `Quiz`, `Result`, `SettingsModal` |
-| `src/store/quizStore.ts` | All state (exams, questions, quiz progress, settings) |
-| `src/utils/parser.ts` | Custom question parser + its own `Question` type (`id: number`) |
-| `src/utils/confetti.ts` | `canvas-confetti` helpers |
-| `src-tauri/` | Tauri shell; `tauri.conf.json` lives here |
 
 ## Question format (parser)
 
@@ -51,12 +37,9 @@ D. Wrong answer
 - Invalid blocks (fewer than 2 options, no correct answer) are silently dropped
 - Questions are re-numbered (0-indexed `id`) on every parse
 
-## Vite / Tauri quirks
+## Vite quirks
 
-- Dev server **must** run on port 1420 (Tauri hard-coded `devUrl`)
-- HMR on port 1421 when `TAURI_DEV_HOST` is set
-- Vite ignores `src-tauri/` in file watcher
-- `beforeDevCommand: "npm run dev"`, `beforeBuildCommand: "npm run build"`
+- Dev server runs on port 1420
 - `tsconfig.node.json` is a project reference for `vite.config.ts` only
 - `tsc` must succeed before Vite bundles (no separate type-check command)
 
@@ -69,7 +52,6 @@ Quiz-in-progress state (`currentIndex`, `answers`, `submitted`, `tab`) is **not*
 ## Caveats
 
 - There are two distinct `Question` types: `src/types.ts` (`id: string`, `options: Option[]`) and `src/utils/parser.ts` (`id: number`, `options: string[]`). The parser's type is the runtime source of truth.
-- Tauri build requires Rust toolchain + MSVC Buildtools (Windows). For headless/CI web builds, `npm run build` alone suffices.
 
 ## Git commit convention
 
