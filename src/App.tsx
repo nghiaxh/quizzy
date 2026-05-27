@@ -71,13 +71,13 @@ export default function App() {
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
           const { mergedExams, stats } = await orchestrateSync(s.exams, s.lastSyncAt);
+          if (stats.uploaded > 0 || stats.downloaded > 0) {
+            useQuizStore.setState({ exams: mergedExams });
+          }
           const st = useQuizStore.getState();
           st.setLastSyncAt(Date.now());
           st.pruneTombstones();
           st.setDriveSyncStatus("success");
-          if (stats.uploaded > 0 || stats.downloaded > 0) {
-            useQuizStore.setState({ exams: mergedExams });
-          }
           break;
         } catch {
           if (attempt < 3) {
@@ -97,13 +97,13 @@ export default function App() {
                 s.setDriveState(true, data?.user?.emailAddress);
               }
               const { mergedExams, stats } = await orchestrateSync(s.exams, s.lastSyncAt);
+              if (stats.uploaded > 0 || stats.downloaded > 0) {
+                useQuizStore.setState({ exams: mergedExams });
+              }
               const st = useQuizStore.getState();
               st.setLastSyncAt(Date.now());
               st.pruneTombstones();
               st.setDriveSyncStatus("success");
-              if (stats.uploaded > 0 || stats.downloaded > 0) {
-                useQuizStore.setState({ exams: mergedExams });
-              }
             } catch {
               useQuizStore.getState().setDriveSyncStatus("error");
             }
@@ -128,13 +128,13 @@ export default function App() {
         try {
           const s = useQuizStore.getState();
           const { mergedExams, stats } = await orchestrateSync(s.exams, s.lastSyncAt);
+          if (stats.uploaded > 0 || stats.downloaded > 0) {
+            useQuizStore.setState({ exams: mergedExams });
+          }
           const st = useQuizStore.getState();
           st.setLastSyncAt(Date.now());
           st.pruneTombstones();
           st.setDriveSyncStatus("success");
-          if (stats.uploaded > 0 || stats.downloaded > 0) {
-            useQuizStore.setState({ exams: mergedExams });
-          }
           break;
         } catch {
           if (attempt < 3) {
@@ -154,13 +154,13 @@ export default function App() {
                 s.setDriveState(true, data?.user?.emailAddress);
               }
               const { mergedExams, stats } = await orchestrateSync(s.exams, s.lastSyncAt);
+              if (stats.uploaded > 0 || stats.downloaded > 0) {
+                useQuizStore.setState({ exams: mergedExams });
+              }
               const st = useQuizStore.getState();
               st.setLastSyncAt(Date.now());
               st.pruneTombstones();
               st.setDriveSyncStatus("success");
-              if (stats.uploaded > 0 || stats.downloaded > 0) {
-                useQuizStore.setState({ exams: mergedExams });
-              }
             } catch {
               useQuizStore.getState().setDriveSyncStatus("error");
             }

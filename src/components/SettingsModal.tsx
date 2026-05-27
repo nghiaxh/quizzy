@@ -132,12 +132,12 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
                     // Initial sync after login
                     setDriveSyncStatus("syncing");
                     const { mergedExams, stats } = await orchestrateSync(exams, lastSyncAt);
-                    setLastSyncAt(Date.now());
-                    pruneTombstones();
-                    setDriveSyncStatus("success");
                     if (stats.uploaded > 0 || stats.downloaded > 0) {
                       useQuizStore.setState({ exams: mergedExams });
                     }
+                    setLastSyncAt(Date.now());
+                    pruneTombstones();
+                    setDriveSyncStatus("success");
                   } catch {
                     setDriveSyncStatus("error");
                   } finally {
@@ -158,6 +158,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
                     onClick={() => {
                       driveSignOut();
                       setDriveState(false);
+                      setLastSyncAt(null);
                     }}>
                     <LogOut size={12} className="mr-1" />
                     Đăng xuất
@@ -185,12 +186,12 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
                       }
                       try {
                         const { mergedExams, stats } = await orchestrateSync(exams, lastSyncAt);
-                        setLastSyncAt(Date.now());
-                        pruneTombstones();
-                        setDriveSyncStatus("success");
                         if (stats.uploaded > 0 || stats.downloaded > 0) {
                           useQuizStore.setState({ exams: mergedExams });
                         }
+                        setLastSyncAt(Date.now());
+                        pruneTombstones();
+                        setDriveSyncStatus("success");
                       } catch {
                         setDriveSyncStatus("error");
                       }
