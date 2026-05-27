@@ -15,8 +15,8 @@ No linter, no test framework, no typecheck script. `npm run build` = the only CI
 
 - React 19 + TypeScript (strict, noUnusedLocals, noUnusedParameters)
 - Vite 7 + `@vitejs/plugin-react`
-- Tailwind CSS 4 (`@import "tailwindcss"` in `index.css`) + DaisyUI 5 (`@plugin "daisyui"`)
-- State: Zustand 5 with `persist` middleware → `localStorage` key `quizzy-storage`
+- Tailwind CSS 4 (`@import "tailwindcss"` in `index.css`) + DaisyUI 5.5 (`@plugin "daisyui"`)
+- State: Zustand 5.12 with `persist` middleware → `localStorage` key `quizzy-storage`
 - CI: GitHub Pages deploy via `npm run build` on push to `main`
 
 ## Question format (parser)
@@ -46,7 +46,7 @@ D. Wrong answer
 ## Persistence
 
 Only these store fields survive page reload (via `zustand/middleware` `partialize`):
-`exams`, `shuffleQuestions`, `soundEnabled`, `effectsEnabled`, `driveConnected`, `driveEmail`, `lastSyncAt`, `driveAutoSync`.
+`exams`, `shuffleQuestions`, `soundEnabled`, `effectsEnabled`, `timerEnabled`, `timerMinutes`, `driveConnected`, `driveEmail`, `lastSyncAt`.
 Quiz-in-progress state (`currentIndex`, `answers`, `submitted`, `tab`) is **not** persisted.
 
 ## Google Drive Sync

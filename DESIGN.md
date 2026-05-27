@@ -22,19 +22,20 @@
               └─────────────────────┘
 ```
 
-Tab navigation at top: `exams | editor | quiz | result`. Only one tab active at a time.
+Tab navigation at top: `exams | editor | quiz | result | review`. Only one tab active at a time.
 
 ## Component tree
 
 ```
 App
-├── NavTabs (exams | editor | quiz | result)
-├── ExamsPage        — List saved exams, start/delete
-├── Editor           — Raw text area + parse preview
-├── Quiz             — Question-by-question: option buttons, progress bar
-│   └── QuestionCard — Single question with A/B/C/D options
-├── Result           — Score summary + confetti animation
-└── SettingsModal    — Shuffle questions, sound, effects toggles
+├── NavTabs (exams | editor | quiz | result | review)
+├── ExamsPage         — List saved exams, start/delete
+├── Editor            — Raw text area + parse preview
+├── Quiz              — Question-by-question: option buttons, progress bar, timer
+│   └── QuestionCard  — Single question with A/B/C/D options
+├── Result            — Score summary + confetti animation
+├── Review            — Review answers after submission
+└── SettingsModal     — Shuffle questions, sound, effects, timer, Drive sync
 ```
 
 ## State (Zustand — `src/store/quizStore.ts`)
@@ -42,7 +43,6 @@ App
 | Slice | Persisted? | Description |
 |---|---|---|
 | `exams` | ✅ | Saved exam list (name + questions) |
-| `currentExam` | ❌ | Exam being taken |
 | `currentIndex` | ❌ | Current question index in quiz |
 | `answers` | ❌ | User's answers for current quiz |
 | `submitted` | ❌ | Whether quiz is submitted |
@@ -50,8 +50,14 @@ App
 | `shuffleQuestions` | ✅ | Toggle for shuffling question order |
 | `soundEnabled` | ✅ | Toggle for sound effects |
 | `effectsEnabled` | ✅ | Toggle for confetti effect |
+| `timerEnabled` | ✅ | Toggle for quiz timer |
+| `timerMinutes` | ✅ | Timer duration in minutes |
+| `driveConnected` | ✅ | Google Drive connection status |
+| `driveEmail` | ✅ | Connected Google account email |
+| `lastSyncAt` | ✅ | Last sync timestamp (null after logout) |
 
 Persist middleware via `partialize` → `localStorage` key `quizzy-storage`.
+Quiz-in-progress state (`currentExam`, `currentIndex`, `answers`, `submitted`, `tab`) is **not** persisted.
 
 ## Question format
 
@@ -97,7 +103,12 @@ There are two `Question` types — the parser's type is the runtime source of tr
 
 ## Visual design
 
-- DaisyUI 5 components (buttons, cards, progress bars)
+- DaisyUI 5.5 components (buttons, cards, progress bars, modals)
 - Tailwind CSS v4 via `@import "tailwindcss"`
 - Clean, minimal layout centered on page
-- Confetti animation on quiz completion
+- Confetti animation on quiz completion (`canvas-confetti`)
+
+## Google Drive Sync
+
+Two-way sync via Google Drive `appDataFolder` (hidden, not visible in user's Drive).
+See `AGENTS.md` → Google Drive Sync for setup and flow details.
