@@ -35,7 +35,7 @@ App
 │   └── QuestionCard  — Single question with A/B/C/D options
 ├── Result            — Score summary + confetti animation
 ├── Review            — Review answers after submission
-└── SettingsModal     — Shuffle questions, sound, effects, timer, Drive sync
+└── SettingsModal     — Shuffle questions, sound, effects, timer
 ```
 
 ## State (Zustand — `src/store/quizStore.ts`)
@@ -52,9 +52,7 @@ App
 | `effectsEnabled` | ✅ | Toggle for confetti effect |
 | `timerEnabled` | ✅ | Toggle for quiz timer |
 | `timerMinutes` | ✅ | Timer duration in minutes |
-| `driveConnected` | ✅ | Google Drive connection status |
-| `driveEmail` | ✅ | Connected Google account email |
-| `lastSyncAt` | ✅ | Last sync timestamp (null after logout) |
+
 
 Persist middleware via `partialize` → `localStorage` key `quizzy-storage`.
 Quiz-in-progress state (`currentExam`, `currentIndex`, `answers`, `submitted`, `tab`) is **not** persisted.
@@ -108,7 +106,4 @@ There are two `Question` types — the parser's type is the runtime source of tr
 - Clean, minimal layout centered on page
 - Confetti animation on quiz completion (`canvas-confetti`)
 
-## Google Drive Sync
 
-Two-way sync via Google Drive `appDataFolder` (hidden, not visible in user's Drive).
-See `AGENTS.md` → Google Drive Sync for setup and flow details.

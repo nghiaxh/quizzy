@@ -276,9 +276,9 @@ export default function ExamsPage() {
   const [detailExamId, setDetailExamId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const filtered = exams.filter((e) => !e.deletedAt && e.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = exams.filter((e) => e.name.toLowerCase().includes(search.toLowerCase()));
 
-  const detailExam = detailExamId ? (exams.find((e) => e.id === detailExamId && !e.deletedAt) ?? null) : null;
+  const detailExam = detailExamId ? (exams.find((e) => e.id === detailExamId) ?? null) : null;
 
   const handleImportClick = () => {
     fileInputRef.current?.click();
