@@ -1,6 +1,6 @@
 import { Settings, X, Sun, Moon, Loader2, Trash2, LogOut, Eye, EyeOff } from "lucide-react";
 import { useQuizStore } from "../store/quizStore";
-import { signUp, signIn, signOut, resetPassword, updatePassword } from "../services/supabase";
+import { signUp, signIn, signOut } from "../services/supabase";
 import { useState } from "react";
 
 interface SettingsModalProps {
@@ -16,14 +16,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
   const [password, setPassword] = useState("");
   const [authError, setAuthError] = useState("");
   const [authLoading, setAuthLoading] = useState(false);
-  const [showForgot, setShowForgot] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPasswordReset, setShowPasswordReset] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const handleAuth = async (mode: "login" | "register") => {
@@ -46,40 +39,6 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
       } else {
         setAuthError(msg);
       }
-    }
-    setAuthLoading(false);
-  };
-
-  const handleForgot = async () => {
-    setAuthLoading(true);
-    setAuthError("");
-    try {
-      await resetPassword(email);
-      setResetSent(true);
-    } catch (e: unknown) {
-      setAuthError(e instanceof Error ? e.message : "Lỗi");
-    }
-    setAuthLoading(false);
-  };
-
-  const handleUpdatePassword = async () => {
-    if (newPassword !== confirmPassword) {
-      setAuthError("Mật khẩu không khớp.");
-      return;
-    }
-    if (newPassword.length < 6) {
-      setAuthError("Mật khẩu ít nhất 6 ký tự.");
-      return;
-    }
-    setAuthLoading(true);
-    setAuthError("");
-    try {
-      await updatePassword(newPassword);
-      setShowPasswordReset(false);
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (e: unknown) {
-      setAuthError(e instanceof Error ? e.message : "Lỗi");
     }
     setAuthLoading(false);
   };
@@ -181,24 +140,6 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
                   </button>
                 </div>
               </div>
-            ) : showForgot ? (
-              <div className="space-y-2">
-                <p className="text-xs text-base-content/50">Nhập email để nhận link khôi phục.</p>
-                <input type="email" className="input input-sm input-bordered w-full text-sm" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                {authError && <p className="text-xs text-error">{authError}</p>}
-                {resetSent ? (
-                  <p className="text-xs text-success">Email khôi phục đã được gửi.</p>
-                ) : (
-                  <div className="flex gap-2">
-                    <button className="btn btn-primary btn-xs" onClick={handleForgot} disabled={authLoading}>
-                      {authLoading && <Loader2 size={12} className="animate-spin" />} Gửi email
-                    </button>
-                    <button className="btn btn-ghost btn-xs" onClick={() => { setShowForgot(false); setResetSent(false); setAuthError(""); }}>
-                      Quay lại
-                    </button>
-                  </div>
-                )}
-              </div>
             ) : (
               <div className="space-y-2">
                 <input type="email" className="input input-sm input-bordered w-full text-sm" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -217,9 +158,6 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
                     Đăng ký
                   </button>
                 </div>
-                <button className="text-xs text-primary/50 hover:text-primary cursor-pointer" onClick={() => setShowForgot(true)}>
-                  Quên mật khẩu?
-                </button>
               </div>
             )}
           </div>
@@ -230,36 +168,6 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
           <span>Quizzy 0.5.0 by Nghia Hoang</span>
         </div>
       </div>
-
-      {showPasswordReset && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowPasswordReset(false); setAuthError(""); }} />
-          <div className="relative bg-base-100 border border-base-300 rounded-xl shadow-2xl w-72 p-4 space-y-3">
-            <p className="font-semibold">Đặt lại mật khẩu</p>
-            <div className="relative">
-              <input type={showNewPassword ? "text" : "password"} className="input input-sm input-bordered w-full text-sm pr-8" placeholder="Mật khẩu mới" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
-              <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-base-content/40 hover:text-base-content" onClick={() => setShowNewPassword(!showNewPassword)} tabIndex={-1}>
-                {showNewPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-            </div>
-            <div className="relative">
-              <input type={showConfirmPassword ? "text" : "password"} className="input input-sm input-bordered w-full text-sm pr-8" placeholder="Xác nhận mật khẩu" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
-              <button type="button" className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-base-content/40 hover:text-base-content" onClick={() => setShowConfirmPassword(!showConfirmPassword)} tabIndex={-1}>
-                {showConfirmPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-              </button>
-            </div>
-            {authError && <p className="text-xs text-error">{authError}</p>}
-            <div className="flex gap-2">
-              <button className="btn btn-primary btn-sm flex-1" onClick={handleUpdatePassword} disabled={authLoading}>
-                {authLoading && <Loader2 size={12} className="animate-spin" />} Đặt lại
-              </button>
-              <button className="btn btn-ghost btn-sm flex-1" onClick={() => { setShowPasswordReset(false); setAuthError(""); }}>
-                Hủy
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {confirmDelete && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4">

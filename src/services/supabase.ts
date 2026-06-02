@@ -33,19 +33,6 @@ export const signOut = async () => {
   if (error) throw error
 }
 
-export const resetPassword = async (email: string) => {
-  const { error } = await requireClient().auth.resetPasswordForEmail(email, {
-    redirectTo: window.location.origin + "/",
-  })
-  if (error) throw error
-}
-
-export const updatePassword = async (newPassword: string) => {
-  const { data, error } = await requireClient().auth.updateUser({ password: newPassword })
-  if (error) throw error
-  return data
-}
-
 export const getCurrentUser = () => {
   return requireClient().auth.getSession().then(({ data }) => data.session?.user ?? null)
 }
