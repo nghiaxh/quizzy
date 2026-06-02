@@ -3,47 +3,55 @@ import { createClient, type User } from "@supabase/supabase-js"
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+const hasEnv = !!SUPABASE_URL && !!SUPABASE_ANON_KEY
+
+if (!hasEnv) {
   console.warn("Supabase env vars not set. Cloud sync disabled.")
 }
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+export const supabase = hasEnv ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null
+
+function requireClient() {
+  if (!supabase) throw new Error("Supabase not configured")
+  return supabase
+}
 
 export const signUp = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signUp({ email, password })
+  const { data, error } = await requireClient().auth.signUp({ email, password })
   if (error) throw error
   return data
 }
 
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  const { data, error } = await requireClient().auth.signInWithPassword({ email, password })
   if (error) throw error
   return data
 }
 
 export const signOut = async () => {
-  const { error } = await supabase.auth.signOut()
+  const { error } = await requireClient().auth.signOut()
   if (error) throw error
 }
 
 export const resetPassword = async (email: string) => {
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+  const { error } = await requireClient().auth.resetPasswordForEmail(email, {
     redirectTo: window.location.origin + "/",
   })
   if (error) throw error
 }
 
 export const updatePassword = async (newPassword: string) => {
-  const { data, error } = await supabase.auth.updateUser({ password: newPassword })
+  const { data, error } = await requireClient().auth.updateUser({ password: newPassword })
   if (error) throw error
   return data
 }
 
 export const getCurrentUser = () => {
-  return supabase.auth.getSession().then(({ data }) => data.session?.user ?? null)
+  return requireClient().auth.getSession().then(({ data }) => data.session?.user ?? null)
 }
 
 export const onAuthChange = (cb: (user: User | null) => void) => {
+  if (!supabase) return { unsubscribe: () => {} }
   const { data } = supabase.auth.onAuthStateChange((_event, session) => {
     cb(session?.user ?? null)
   })
@@ -52,7 +60,7 @@ export const onAuthChange = (cb: (user: User | null) => void) => {
 }
 
 export const pushToCloud = async (userId: string, data: { exams: unknown[]; settings: Record<string, unknown> }) => {
-  await supabase.from("user_data").upsert({
+  await requireClient().from("user_data").upsert({
     user_id: userId,
     exams: JSON.stringify(data.exams),
     settings: JSON.stringify(data.settings),
@@ -61,7 +69,7 @@ export const pushToCloud = async (userId: string, data: { exams: unknown[]; sett
 }
 
 export const pullFromCloud = async (userId: string) => {
-  const { data } = await supabase
+  const { data } = await requireClient()
     .from("user_data")
     .select("exams, settings")
     .eq("user_id", userId)
@@ -74,5 +82,5 @@ export const pullFromCloud = async (userId: string) => {
 }
 
 export const deleteCloudAccount = async (userId: string) => {
-  await supabase.from("user_data").delete().eq("user_id", userId)
+  await requireClient().from("user_data").delete().eq("user_id", userId)
 }
