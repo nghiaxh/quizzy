@@ -17,7 +17,8 @@ No linter, no test framework, no typecheck script. `npm run build` = the only CI
 - Vite 7 + `@vitejs/plugin-react`
 - Tailwind CSS 4 (`@import "tailwindcss"` in `index.css`) + DaisyUI 5.5 (`@plugin "daisyui"`)
 - State: Zustand 5.12 with `persist` middleware → `localStorage` key `quizzy-storage`
-- CI: GitHub Pages deploy via `npm run build` on push to `main`
+- PWA: `vite-plugin-pwa` (Workbox-based service worker, precaches static assets, offline support)
+- CI: GitHub Pages deploy via `.github/workflows/deploy.yml` on push to `main`
 
 ## Question format (parser)
 

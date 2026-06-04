@@ -106,4 +106,13 @@ There are two `Question` types — the parser's type is the runtime source of tr
 - Clean, minimal layout centered on page
 - Confetti animation on quiz completion (`canvas-confetti`)
 
+## PWA
+
+- Service worker via `vite-plugin-pwa` (Workbox `generateSW` mode)
+- Precaches all static assets (JS, CSS, HTML, images, audio) — ~1 MB, 10 entries
+- `NetworkFirst` strategy for external requests with 7-day cache
+- `autoUpdate` — service worker updates silently when a new version is deployed
+- Web app manifest with standalone display, 192×192 and 512×512 icons
+- Installable on mobile and desktop
+
 
