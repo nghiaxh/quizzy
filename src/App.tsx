@@ -7,25 +7,26 @@ import ExamsPage from "./components/ExamsPage";
 import SettingsModal from "./components/SettingsModal";
 import { PenLine, ClipboardList, Settings, LibraryBig } from "lucide-react";
 import { useState, useEffect } from "react";
-
-const TABS = [
-  { key: "exams" as const, label: "Đề thi", icon: LibraryBig },
-  { key: "editor" as const, label: "Chỉnh sửa", icon: PenLine },
-  { key: "quiz" as const, label: "Ôn tập", icon: ClipboardList },
-] as const;
+import { useTranslation } from "./i18n/useTranslation";
 
 export default function App() {
   const { tab, setTab, questions, activeExamId } = useQuizStore();
   const [showSettings, setShowSettings] = useState(false);
+  const { t } = useTranslation();
   const [theme, setThemeState] = useState<"light" | "dark">(() => {
     return (localStorage.getItem("theme") as "light" | "dark") || "light";
   });
 
+  const TABS = [
+    { key: "exams" as const, label: t("app.tab.exams"), icon: LibraryBig },
+    { key: "editor" as const, label: t("app.tab.editor"), icon: PenLine },
+    { key: "quiz" as const, label: t("app.tab.quiz"), icon: ClipboardList },
+  ] as const;
 
-  const setTheme = (t: "light" | "dark") => {
-    setThemeState(t);
-    document.documentElement.setAttribute("data-theme", t);
-    localStorage.setItem("theme", t);
+  const setTheme = (th: "light" | "dark") => {
+    setThemeState(th);
+    document.documentElement.setAttribute("data-theme", th);
+    localStorage.setItem("theme", th);
   };
 
   useEffect(() => {
@@ -42,14 +43,14 @@ export default function App() {
       {/* Tab bar */}
       <div className="flex items-center justify-between px-4 py-2 bg-base-200 border-b border-base-300">
         <div className="flex items-center gap-1 bg-base-300/50 rounded-xl p-1">
-          {TABS.map((t) => {
-            const disabled = (t.key === "editor" && !hasActiveExam) || (t.key === "quiz" && (!hasActiveExam || !hasQuestions));
-            const Icon = t.icon;
-            const isActive = tab === t.key;
+          {TABS.map((tabItem) => {
+            const disabled = (tabItem.key === "editor" && !hasActiveExam) || (tabItem.key === "quiz" && (!hasActiveExam || !hasQuestions));
+            const Icon = tabItem.icon;
+            const isActive = tab === tabItem.key;
             return (
-              <button key={t.key} onClick={() => !disabled && setTab(t.key)} disabled={disabled} title={t.key === "editor" && disabled ? "Chọn đề thi trước" : t.key === "quiz" && disabled ? "Soạn câu hỏi trước" : undefined} className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
+              <button key={tabItem.key} onClick={() => !disabled && setTab(tabItem.key)} disabled={disabled} title={tabItem.key === "editor" && disabled ? t("app.editorDisabled") : tabItem.key === "quiz" && disabled ? t("app.quizDisabled") : undefined} className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
                 <Icon size={13} />
-                {t.label}
+                {tabItem.label}
               </button>
             );
           })}

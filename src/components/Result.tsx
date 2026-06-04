@@ -2,16 +2,22 @@ import { useEffect } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { fireBig } from "../utils/confetti";
 import { RotateCcw, PenLine, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { useTranslation } from "../i18n/useTranslation";
 
 export default function Result() {
   const { questions, submitted, score, startQuiz, setTab, effectsEnabled } = useQuizStore();
+  const { t } = useTranslation();
 
   const total = questions.length;
   const correct = score();
   const wrong = Object.keys(submitted).length - correct;
   const pct = total ? Math.round((correct / total) * 100) : 0;
 
-  const verdict = pct >= 80 ? { text: "Xuất sắc!", cls: "text-success" } : pct >= 60 ? { text: "Tốt!", cls: "text-primary" } : pct >= 40 ? { text: "Cần ôn thêm", cls: "text-warning" } : { text: "Cố gắng hơn nhé", cls: "text-error" };
+  const verdict =
+    pct >= 80 ? { text: t("result.excellent"), cls: "text-success" } :
+    pct >= 60 ? { text: t("result.good"), cls: "text-primary" } :
+    pct >= 40 ? { text: t("result.needReview"), cls: "text-warning" } :
+    { text: t("result.tryHarder"), cls: "text-error" };
 
   const circumference = 2 * Math.PI * 54;
   const ringColor = pct >= 80 ? "text-success" : pct >= 60 ? "text-primary" : pct >= 40 ? "text-warning" : "text-error";
@@ -47,8 +53,8 @@ export default function Result() {
       {/* Stats */}
       <div className="flex gap-4">
         {[
-          { label: "Đúng", value: correct, cls: "text-success", bg: "bg-success/10", icon: CheckCircle2 },
-          { label: "Sai", value: wrong, cls: "text-error", bg: "bg-error/10", icon: XCircle },
+          { label: t("result.correct"), value: correct, cls: "text-success", bg: "bg-success/10", icon: CheckCircle2 },
+          { label: t("result.wrong"), value: wrong, cls: "text-error", bg: "bg-error/10", icon: XCircle },
         ].map(({ label, value, cls, bg, icon: Icon }) => (
           <div key={label} className={`${bg} rounded-2xl px-8 py-4 text-center`}>
             <Icon size={20} className={`mx-auto mb-1.5 ${cls}`} />
@@ -61,15 +67,15 @@ export default function Result() {
       <div className="flex gap-2">
         <button className="flex items-center gap-1.5 btn btn-primary" onClick={handleRetry}>
           <RotateCcw size={14} />
-          Làm lại
+          {t("result.retry")}
         </button>
         <button className="flex items-center gap-1.5 btn btn-outline" onClick={() => setTab("review")}>
           <Eye size={14} />
-          Xem lại
+          {t("result.review")}
         </button>
         <button className="flex items-center gap-1.5 btn btn-ghost" onClick={() => setTab("editor")}>
           <PenLine size={14} />
-          Sửa đề
+          {t("result.edit")}
         </button>
       </div>
     </div>

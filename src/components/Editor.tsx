@@ -2,21 +2,24 @@ import { useQuizStore } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
 import { CheckCircle2, Search, FileText } from "lucide-react";
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslation } from "../i18n/useTranslation";
 
 const CORRECT_LABELS = ["A", "B", "C", "D"];
 
-function makeSampleQuestion(n: number) {
+function makeSampleQuestion(n: number, lang: string) {
   const correctIdx = (n - 1) % 4;
   const options = CORRECT_LABELS.map((label, i) =>
-    `${i === correctIdx ? "*" : ""}${label}. Đáp án ${label}`
+    `${i === correctIdx ? "*" : ""}${label}. ${lang === "vi" ? `Đáp án ${label}` : `Answer ${label}`}`
   );
-  return `${n}. Nội dung câu hỏi\n${options.join("\n")}`;
+  return `${n}. ${lang === "vi" ? "Nội dung câu hỏi" : `Question content`}\n${options.join("\n")}`;
 }
 
-const SAMPLE_EXAM = Array.from({ length: 10 }, (_, i) => makeSampleQuestion(i + 1)).join("\n\n");
+const SAMPLE_EXAM_VI = Array.from({ length: 10 }, (_, i) => makeSampleQuestion(i + 1, "vi")).join("\n\n");
+const SAMPLE_EXAM_EN = Array.from({ length: 10 }, (_, i) => makeSampleQuestion(i + 1, "en")).join("\n\n");
 
 export default function Editor() {
   const { rawText, setRawText } = useQuizStore();
+  const { t, lang } = useTranslation();
   const preview = parseQuestions(rawText);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -81,11 +84,11 @@ export default function Editor() {
 
   const handleAddSample = () => {
     const next = preview.length + 1;
-    setRawText(rawText ? `${rawText}\n\n${makeSampleQuestion(next)}` : makeSampleQuestion(next));
+    setRawText(rawText ? `${rawText}\n\n${makeSampleQuestion(next, lang)}` : makeSampleQuestion(next, lang));
   };
 
   const handleLoadSample = () => {
-    setRawText(SAMPLE_EXAM);
+    setRawText(lang === "vi" ? SAMPLE_EXAM_VI : SAMPLE_EXAM_EN);
   };
 
   return (
@@ -93,20 +96,20 @@ export default function Editor() {
       {/* Editor */}
       <div className="flex flex-col flex-1 min-w-0">
         <div className="flex items-center justify-between px-4 py-2.5 bg-base-200 border-b border-base-300">
-          <span className="text-xs font-medium text-base-content/50">Soạn câu hỏi</span>
+          <span className="text-xs font-medium text-base-content/50">{t("editor.title")}</span>
           <div className="flex items-center gap-1">
-            <button className="btn btn-xs btn-ghost text-secondary flex items-center gap-1" onClick={handleAddSample} title="Thêm câu hỏi mẫu">
+            <button className="btn btn-xs btn-ghost text-secondary flex items-center gap-1" onClick={handleAddSample} title={t("editor.addSample")}>
               <FileText size={13} />
-              <span className="text-xs">Thêm câu mẫu</span>
+              <span className="text-xs">{t("editor.addSample")}</span>
             </button>
-            <button className="btn btn-xs btn-ghost text-primary flex items-center gap-1" onClick={handleLoadSample} title="Tạo đề mẫu">
+            <button className="btn btn-xs btn-ghost text-primary flex items-center gap-1" onClick={handleLoadSample} title={t("editor.loadSample")}>
               <FileText size={13} />
-              <span className="text-xs">Tạo đề mẫu</span>
+              <span className="text-xs">{t("editor.loadSample")}</span>
             </button>
           </div>
         </div>
 
-        <textarea ref={textareaRef} className="flex-1 p-5 text-sm font-mono resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={`1. Câu hỏi của bạn\nA. Sai\n*B. Đúng\nC. Sai\nD. Sai\n\n2. Câu hỏi tiếp theo\n*A. Đúng\nB. Sai\nC. Sai\nD. Sai`} />
+        <textarea ref={textareaRef} className="flex-1 p-5 text-sm font-mono resize-none bg-base-100 outline-none leading-7 text-base-content placeholder:text-base-content/20" value={rawText} onChange={(e) => setRawText(e.target.value)} spellCheck={false} placeholder={t("editor.placeholder")} />
       </div>
 
       {/* Divider */}
@@ -117,18 +120,18 @@ export default function Editor() {
         {/* Header */}
         <div className="px-4 py-2.5 border-b border-base-300 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-30">
-            <input className="input input-sm input-bordered w-full text-xs" placeholder="Tìm nội dung câu hỏi..." value={searchPreview} onChange={(e) => setSearchPreview(e.target.value)} />
+            <input className="input input-sm input-bordered w-full text-xs" placeholder={t("editor.searchPlaceholder")} value={searchPreview} onChange={(e) => setSearchPreview(e.target.value)} />
           </div>
           <div className="flex items-center gap-1">
-            <input className="input input-sm input-bordered w-24 text-xs text-center" placeholder="Tìm câu" value={gotoPreview} onChange={(e) => setGotoPreview(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleGoToQuestion()} />
+            <input className="input input-sm input-bordered w-24 text-xs text-center" placeholder={t("editor.gotoPlaceholder")} value={gotoPreview} onChange={(e) => setGotoPreview(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleGoToQuestion()} />
             <button className="btn btn-sm" onClick={handleGoToQuestion}>
-              <span>Tìm</span>
+              <span>{t("editor.find")}</span>
             </button>
           </div>
           {preview.length > 0 && (
             <span className="flex items-center gap-1 text-xs text-success font-medium ml-auto">
               <CheckCircle2 size={12} />
-              {preview.length} câu
+              {preview.length} {t("editor.questions")}
             </span>
           )}
         </div>
@@ -137,7 +140,7 @@ export default function Editor() {
           {filteredPreview.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full gap-3 text-base-content/20">
               <Search size={28} />
-              <span className="text-xs text-center">{searchPreview ? "Không tìm thấy" : rawText.trim() === "" ? "Soạn câu hỏi hoặc nhấn Tạo đề mẫu để bắt đầu" : "Chưa có câu hỏi hợp lệ"}</span>
+              <span className="text-xs text-center">{searchPreview ? t("editor.noMatch") : rawText.trim() === "" ? t("editor.startHint") : t("editor.noValid")}</span>
             </div>
           ) : (
             filteredPreview.map((q) => (

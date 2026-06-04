@@ -1,17 +1,19 @@
 import { useQuizStore } from "../store/quizStore";
 import { CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import { useTranslation } from "../i18n/useTranslation";
 
 const LABELS = ["A", "B", "C", "D"];
 
 export default function Review() {
   const { questions, answers, submitted, setTab } = useQuizStore();
+  const { t } = useTranslation();
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
       <div className="flex items-center gap-3 px-5 py-3 border-b border-base-300 bg-base-100">
         <button className="flex items-center gap-1.5 btn btn-ghost btn-sm" onClick={() => setTab("result")}>
           <ArrowLeft size={14} />
-          Quay lại
+          {t("review.back")}
         </button>
       </div>
       <div className="flex-1 overflow-y-auto p-5">

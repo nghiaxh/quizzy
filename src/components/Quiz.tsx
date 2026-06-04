@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { ChevronLeft, ChevronRight, CheckSquare, Timer } from "lucide-react";
+import { useTranslation } from "../i18n/useTranslation";
 
 const LABELS = ["A", "B", "C", "D"];
 
@@ -11,20 +12,22 @@ function formatTime(s: number) {
 }
 
 function EmptyState() {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 text-base-content/30">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="8" y="2" width="8" height="4" rx="1" />
         <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
       </svg>
-      <p className="text-sm font-medium">Chưa có câu hỏi</p>
-      <p className="text-xs">Soạn đề trong tab Editor trước nhé</p>
+      <p className="text-sm font-medium">{t("quiz.emptyTitle")}</p>
+      <p className="text-xs">{t("quiz.emptyDesc")}</p>
     </div>
   );
 }
 
 export default function Quiz() {
   const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion, quizEndTime, submitAllAndFinish } = useQuizStore();
+  const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
@@ -166,22 +169,22 @@ export default function Quiz() {
         <div className="flex items-center justify-center gap-3">
           <button className="flex items-center gap-2 btn btn-md btn-ghost" onClick={prevQuestion} disabled={currentIndex === 0}>
             <ChevronLeft size={18} />
-            Trước
+            {t("quiz.prev")}
           </button>
 
           {!isSubmitted ? (
             <button className={`flex items-center gap-2 btn btn-md transition-all ${hasChosen ? "btn-primary" : "btn-disabled bg-base-200 text-base-content/25 border-base-200"}`} onClick={() => hasChosen && selectAnswer(q.id, chosen, true)} disabled={!hasChosen}>
               <CheckSquare size={17} />
-              Kiểm tra
+              {t("quiz.check")}
             </button>
           ) : isLast ? (
             <button className={`flex items-center gap-2 btn btn-md ${allSubmitted ? "btn-primary" : "btn-disabled opacity-40"}`} onClick={nextQuestion} disabled={!allSubmitted}>
-              Xem kết quả
+              {t("quiz.viewResult")}
               <ChevronRight size={17} />
             </button>
           ) : (
             <button className="flex items-center gap-2 btn btn-md btn-outline btn-success" onClick={nextQuestion}>
-              Câu tiếp
+              {t("quiz.next")}
               <ChevronRight size={17} />
             </button>
           )}
