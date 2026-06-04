@@ -17,6 +17,7 @@ No linter, no test framework, no typecheck script. `npm run build` = the only CI
 - Vite 7 + `@vitejs/plugin-react`
 - Tailwind CSS 4 (`@import "tailwindcss"` in `index.css`) + DaisyUI 5.5 (`@plugin "daisyui"`)
 - State: Zustand 5.12 with `persist` middleware → `localStorage` key `quizzy-storage`
+- i18n: simple key-based system in `src/i18n/` (English default, Vietnamese supported)
 - PWA: `vite-plugin-pwa` (Workbox-based service worker, precaches static assets, offline support)
 - CI: GitHub Pages deploy via `.github/workflows/deploy.yml` on push to `main`
 
@@ -47,7 +48,7 @@ D. Wrong answer
 ## Persistence
 
 Only these store fields survive page reload (via `zustand/middleware` `partialize`):
-`exams`, `shuffleQuestions`, `soundEnabled`, `effectsEnabled`, `timerEnabled`, `timerMinutes`.
+`exams`, `shuffleQuestions`, `soundEnabled`, `effectsEnabled`, `timerEnabled`, `timerMinutes`, `language`.
 Quiz-in-progress state (`currentIndex`, `answers`, `submitted`, `tab`) is **not** persisted.
 
 ## Git commit convention

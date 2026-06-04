@@ -1,40 +1,39 @@
-# Quizzy - Ứng dụng tạo & ôn tập trắc nghiệm
+# Quizzy - Multiple choice exam tool
 
-Quizzy là công cụ soạn đề thi trắc nghiệm, hỗ trợ ôn tập trực tiếp trên trình duyệt.
+Quizzy is a browser-based tool for creating and practicing multiple choice exams. Create exams, edit questions using a simple plain-text format, take quizzes, and view detailed results.
 
-Bạn có thể tạo nhiều đề, chỉnh sửa câu hỏi theo cú pháp đơn giản, làm bài kiểm tra và nhận kết quả chi tiết.
+## Features
 
-## Các tính năng
+- **Manage multiple exams** – create, delete, rename, duplicate
+- **Question editor** with clear syntax and live preview
+- **Synced scrolling** between editor and preview panes
+- **Search questions** by content or number
+- **Practice mode** – answer one by one, check answers instantly
+- **Detailed results** – correct/wrong count, percentage, confetti animation
+- **Timer** – optional time limit per quiz
+- **Export / Import JSON** – save exams as JSON files for sharing
+- **Light / Dark mode**
+- **Multi-language** – English and Vietnamese (Tiếng Việt)
+- **PWA** – installable as a native app, works offline
+- **Responsive** – works on mobile and desktop
 
-- **Quản lý nhiều đề thi** – tạo, xóa, đổi tên, nhân bản.
-- **Soạn thảo câu hỏi** với cú pháp rõ ràng, xem trước trực quan.
-- **Đồng bộ cuộn** giữa khung soạn & xem trước.
-- **Tìm kiếm câu hỏi** – lọc theo nội dung hoặc số thứ tự.
-- **Ôn tập** từng câu, kiểm tra ngay, xem đáp án đúng.
-- **Kết quả chi tiết** – số câu đúng/sai, phần trăm, hiệu ứng confetti khi điểm cao.
-- **Hẹn giờ làm bài** – tùy chọn thời gian giới hạn cho mỗi đề.
-- **Xuất / Nhập JSON** – lưu đề thi dưới dạng file JSON, dễ dàng chia sẻ.
-- **Giao diện sáng/tối** (light/dark mode).
-- **Responsive** – hoạt động tốt trên điện thoại và máy tính.
-- **PWA** – cài đặt như ứng dụng gốc, hỗ trợ offline.
-
-## Công nghệ
+## Tech stack
 
 - [React 19](https://react.dev) + TypeScript (strict mode)
-- [Zustand 5](https://zustand-demo.pmnd.rs) (quản lý state, persist qua localStorage)
+- [Zustand 5](https://zustand-demo.pmnd.rs) (state management, persisted to localStorage)
 - [Tailwind CSS 4](https://tailwindcss.com) + [DaisyUI 5](https://daisyui.com)
-- [canvas-confetti](https://github.com/catdad/canvas-confetti) – hiệu ứng chúc mừng
+- [canvas-confetti](https://github.com/catdad/canvas-confetti) – celebration effect
 - [Vite 7](https://vitejs.dev) – build tool
 - [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) – service worker, offline support
-- CI/CD: GitHub Pages deploy tự động qua GitHub Actions
+- CI/CD: GitHub Pages deploy via GitHub Actions
 
-## Phát triển
+## Development
 
-### Yêu cầu
+### Prerequisites
 
 - Node.js >= 18
 
-### Cài đặt
+### Setup
 
 ```bash
 git clone https://github.com/nghiaxh/quizzy.git
@@ -43,7 +42,7 @@ npm install
 npm run dev
 ```
 
-Mở trình duyệt tại `http://localhost:5173`.
+Open browser at `http://localhost:5173`.
 
 ### Build
 
