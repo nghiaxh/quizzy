@@ -7,7 +7,6 @@ import ExamsPage from "./components/ExamsPage";
 import SettingsModal from "./components/SettingsModal";
 import { PenLine, ClipboardList, Settings, LibraryBig } from "lucide-react";
 import { useState, useEffect } from "react";
-import { onAuthChange } from "./services/supabase";
 
 const TABS = [
   { key: "exams" as const, label: "Đề thi", icon: LibraryBig },
@@ -16,7 +15,7 @@ const TABS = [
 ] as const;
 
 export default function App() {
-  const { tab, setTab, questions, activeExamId, setSupabaseUser } = useQuizStore();
+  const { tab, setTab, questions, activeExamId } = useQuizStore();
   const [showSettings, setShowSettings] = useState(false);
   const [theme, setThemeState] = useState<"light" | "dark">(() => {
     return (localStorage.getItem("theme") as "light" | "dark") || "light";
@@ -31,13 +30,6 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-  }, []);
-
-  useEffect(() => {
-    const sub = onAuthChange((user) => {
-      setSupabaseUser(user);
-    });
-    return () => sub.unsubscribe();
   }, []);
 
   const hasQuestions = questions.length > 0;

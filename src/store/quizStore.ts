@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Question, parseQuestions } from "../utils/parser";
 import { fireCorrect } from "../utils/confetti";
-import type { User } from "@supabase/supabase-js";
-import { pushToCloud, pullFromCloud, deleteCloudAccount, signOut } from "../services/supabase";
 
 export type Tab = "exams" | "editor" | "quiz" | "result" | "review";
 
@@ -58,15 +56,8 @@ interface QuizStore {
   quizEndTime: number | null;
   submitAllAndFinish: () => void;
 
-  supabaseUser: User | null;
-  setSupabaseUser: (user: User | null) => void;
-  syncCloud: () => Promise<void>;
-  loadFromCloud: () => Promise<void>;
   exportToFile: () => void;
   importFromFile: (file: File) => Promise<void>;
-  deleteCloudAccount: () => Promise<void>;
-  syncStatus: "idle" | "syncing" | "error" | "success";
-  setSyncStatus: (status: "idle" | "syncing" | "error" | "success") => void;
 }
 
 function genId() {
@@ -82,32 +73,6 @@ function shuffleArray<T>(array: T[]): T[] {
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
   return shuffled;
-}
-
-let syncTimer: ReturnType<typeof setTimeout> | null = null;
-
-export function scheduleSync() {
-  if (syncTimer) clearTimeout(syncTimer);
-  syncTimer = setTimeout(async () => {
-    const s = useQuizStore.getState();
-    if (!s.supabaseUser) return;
-    try {
-      s.setSyncStatus("syncing");
-      await pushToCloud(s.supabaseUser.id, {
-        exams: s.exams,
-        settings: {
-          shuffleQuestions: s.shuffleQuestions,
-          soundEnabled: s.soundEnabled,
-          effectsEnabled: s.effectsEnabled,
-          timerEnabled: s.timerEnabled,
-          timerMinutes: s.timerMinutes,
-        },
-      });
-      s.setSyncStatus("success");
-    } catch {
-      s.setSyncStatus("error");
-    }
-  }, 1500);
 }
 
 export const useQuizStore = create<QuizStore>()(
@@ -137,7 +102,6 @@ export const useQuizStore = create<QuizStore>()(
           updatedAt: Date.now(),
         };
         set((s) => ({ exams: [...s.exams, exam] }));
-        scheduleSync();
         return id;
       },
 
@@ -146,14 +110,12 @@ export const useQuizStore = create<QuizStore>()(
           exams: s.exams.filter((e) => e.id !== id),
           activeExamId: s.activeExamId === id ? null : s.activeExamId,
         }));
-        scheduleSync();
       },
 
       renameExam: (id, name) => {
         set((s) => ({
           exams: s.exams.map((e) => (e.id === id ? { ...e, name: name.trim() || e.name, updatedAt: Date.now() } : e)),
         }));
-        scheduleSync();
       },
 
       duplicateExam: (id) => {
@@ -168,7 +130,6 @@ export const useQuizStore = create<QuizStore>()(
           updatedAt: Date.now(),
         };
         set((s) => ({ exams: [...s.exams, copy] }));
-        scheduleSync();
       },
 
       selectExam: (id) => {
@@ -200,7 +161,6 @@ export const useQuizStore = create<QuizStore>()(
           originalQuestions: parsedQuestions,
           exams: s.exams.map((e) => (e.id === activeExamId ? { ...e, rawText: text, updatedAt: Date.now() } : e)),
         }));
-        scheduleSync();
       },
 
       currentIndex: 0,
@@ -303,67 +263,17 @@ export const useQuizStore = create<QuizStore>()(
       },
 
       shuffleQuestions: false,
-      setShuffleQuestions: (shuffle) => { set({ shuffleQuestions: shuffle }); scheduleSync(); },
+      setShuffleQuestions: (shuffle) => { set({ shuffleQuestions: shuffle }); },
       soundEnabled: true,
-      setSoundEnabled: (enabled) => { set({ soundEnabled: enabled }); scheduleSync(); },
+      setSoundEnabled: (enabled) => { set({ soundEnabled: enabled }); },
       effectsEnabled: true,
-      setEffectsEnabled: (enabled) => { set({ effectsEnabled: enabled }); scheduleSync(); },
+      setEffectsEnabled: (enabled) => { set({ effectsEnabled: enabled }); },
 
       timerEnabled: false,
-      setTimerEnabled: (enabled) => { set({ timerEnabled: enabled }); scheduleSync(); },
+      setTimerEnabled: (enabled) => { set({ timerEnabled: enabled }); },
       timerMinutes: 10,
-      setTimerMinutes: (minutes) => { set({ timerMinutes: minutes }); scheduleSync(); },
+      setTimerMinutes: (minutes) => { set({ timerMinutes: minutes }); },
       quizEndTime: null,
-
-      supabaseUser: null,
-      syncStatus: "idle",
-
-      setSupabaseUser: (user) => set({ supabaseUser: user }),
-
-      setSyncStatus: (status) => set({ syncStatus: status }),
-
-      syncCloud: async () => {
-        const s = get();
-        if (!s.supabaseUser) return;
-        try {
-          set({ syncStatus: "syncing" });
-          await pushToCloud(s.supabaseUser.id, {
-            exams: s.exams,
-            settings: {
-              shuffleQuestions: s.shuffleQuestions,
-              soundEnabled: s.soundEnabled,
-              effectsEnabled: s.effectsEnabled,
-              timerEnabled: s.timerEnabled,
-              timerMinutes: s.timerMinutes,
-            },
-          });
-          set({ syncStatus: "success" });
-        } catch {
-          set({ syncStatus: "error" });
-        }
-      },
-
-      loadFromCloud: async () => {
-        const s = get();
-        if (!s.supabaseUser) return;
-        try {
-          set({ syncStatus: "syncing" });
-          const cloud = await pullFromCloud(s.supabaseUser.id);
-          if (cloud) {
-            set({
-              exams: cloud.exams as Exam[],
-              shuffleQuestions: (cloud.settings as Record<string, unknown>).shuffleQuestions as boolean ?? false,
-              soundEnabled: (cloud.settings as Record<string, unknown>).soundEnabled as boolean ?? true,
-              effectsEnabled: (cloud.settings as Record<string, unknown>).effectsEnabled as boolean ?? true,
-              timerEnabled: (cloud.settings as Record<string, unknown>).timerEnabled as boolean ?? false,
-              timerMinutes: (cloud.settings as Record<string, unknown>).timerMinutes as number ?? 10,
-            });
-          }
-          set({ syncStatus: "success" });
-        } catch {
-          set({ syncStatus: "error" });
-        }
-      },
 
       exportToFile: () => {
         const s = get();
@@ -391,16 +301,7 @@ export const useQuizStore = create<QuizStore>()(
             timerEnabled: data.settings?.timerEnabled ?? false,
             timerMinutes: data.settings?.timerMinutes ?? 10,
           });
-          scheduleSync();
         }
-      },
-
-      deleteCloudAccount: async () => {
-        const s = get();
-        if (!s.supabaseUser) return;
-        await deleteCloudAccount(s.supabaseUser.id);
-        await signOut();
-        set({ supabaseUser: null });
       },
 
     }),
@@ -413,7 +314,6 @@ export const useQuizStore = create<QuizStore>()(
         effectsEnabled: s.effectsEnabled,
         timerEnabled: s.timerEnabled,
         timerMinutes: s.timerMinutes,
-        supabaseUser: s.supabaseUser,
       }),
     },
   ),
