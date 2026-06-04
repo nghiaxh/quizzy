@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Question, parseQuestions } from "../utils/parser";
 import { fireCorrect } from "../utils/confetti";
+import type { Language } from "../i18n/translations";
+import { t } from "../i18n/translations";
 
 export type Tab = "exams" | "editor" | "quiz" | "result" | "review";
 
@@ -55,6 +57,9 @@ interface QuizStore {
   setTimerMinutes: (minutes: number) => void;
   quizEndTime: number | null;
   submitAllAndFinish: () => void;
+
+  language: Language;
+  setLanguage: (lang: Language) => void;
 
   exportToFile: () => void;
   importFromFile: (file: File) => Promise<void>;
@@ -122,10 +127,11 @@ export const useQuizStore = create<QuizStore>()(
         const exam = get().exams.find((e) => e.id === id);
         if (!exam) return;
         const newId = genId();
+        const lang = get().language;
         const copy: Exam = {
           ...exam,
           id: newId,
-          name: `${exam.name} (bản sao)`,
+          name: `${exam.name} ${t(lang, "exams.copySuffix")}`,
           createdAt: Date.now(),
           updatedAt: Date.now(),
         };
@@ -275,6 +281,9 @@ export const useQuizStore = create<QuizStore>()(
       setTimerMinutes: (minutes) => { set({ timerMinutes: minutes }); },
       quizEndTime: null,
 
+      language: "en",
+      setLanguage: (lang) => { set({ language: lang }); },
+
       exportToFile: () => {
         const s = get();
         const blob = new Blob(
@@ -314,6 +323,7 @@ export const useQuizStore = create<QuizStore>()(
         effectsEnabled: s.effectsEnabled,
         timerEnabled: s.timerEnabled,
         timerMinutes: s.timerMinutes,
+        language: s.language,
       }),
     },
   ),
