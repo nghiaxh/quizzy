@@ -1,5 +1,7 @@
 # Quizzy — AGENTS.md
 
+Quizzy is a browser-based multiple-choice exam tool. No backend, no database — everything runs in the browser.
+
 ## Quick start
 
 ```bash
@@ -11,6 +13,20 @@ npm run preview        # Vite preview of built dist/
 
 No linter, no test framework, no typecheck script. `npm run build` = the only CI gate.
 
+## App flow (simple)
+
+```
+Exams page → select exam → Editor (write questions) → Quiz (take quiz) → Result (score) → Review (answers)
+```
+
+5 tabs (`exams | editor | quiz | result | review`), tab-switching is just a Zustand `setTab()` call — no router.
+
+- **ExamsPage** — list/create/import/delete/duplicate exams
+- **Editor** — raw text textarea + live parse preview; auto-saves to active exam
+- **Quiz** — one question at a time, instant feedback (sound + confetti on correct), optional timer
+- **Result** — score ring chart, retry/review/edit buttons, big confetti if ≥80%
+- **Review** — scroll through all questions with correct/wrong indicators
+
 ## Stack
 
 - React 19 + TypeScript (strict, noUnusedLocals, noUnusedParameters)
@@ -21,9 +37,18 @@ No linter, no test framework, no typecheck script. `npm run build` = the only CI
 - PWA: `vite-plugin-pwa` (Workbox-based service worker, precaches static assets, offline support)
 - CI: GitHub Pages deploy via `.github/workflows/deploy.yml` on push to `main`
 
+## State management (Zustand)
+
+Single store in `src/store/quizStore.ts`. Persisted fields (survive reload):
+`exams`, `shuffleQuestions`, `soundEnabled`, `effectsEnabled`, `timerEnabled`, `timerMinutes`, `language`.
+
+Everything else (`currentIndex`, `answers`, `submitted`, `tab`, `questions`) resets on page reload.
+
+Key flow: user clicks an exam → `selectExam(id)` parses raw text via `parseQuestions()` → sets `activeExamId` + `questions` + `originalQuestions` → switches to editor tab. When user navigates to quiz → `startQuiz()` optionally shuffles, resets answers, sets timer.
+
 ## Question format (parser)
 
-Questions are parsed from raw text by blank-line separation. Each block:
+Parser lives in `src/utils/parser.ts`. Questions separated by blank lines:
 
 ```
 1. Question text
@@ -33,23 +58,15 @@ C. Wrong answer
 D. Wrong answer
 ```
 
-- Asterisk `*` marks the correct option
-- Options are `A`–`D` (2–4 supported)
-- Multi-line question text and multi-line options are supported (continuation lines without the `X. ` prefix)
-- Invalid blocks (fewer than 2 options, no correct answer) are silently dropped
-- Questions are re-numbered (0-indexed `id`) on every parse
+- `*` marks correct option, options `A`–`D` (2–4 supported)
+- Multi-line text supported (continuation lines without prefix)
+- Invalid blocks silently dropped, questions re-numbered 0-indexed on every parse
 
 ## Vite quirks
 
-- Dev server runs on port 5173 (Vite default)
+- Dev server on port 5173 (Vite default)
 - `tsconfig.node.json` is a project reference for `vite.config.ts` only
 - `tsc` must succeed before Vite bundles (no separate type-check command)
-
-## Persistence
-
-Only these store fields survive page reload (via `zustand/middleware` `partialize`):
-`exams`, `shuffleQuestions`, `soundEnabled`, `effectsEnabled`, `timerEnabled`, `timerMinutes`, `language`.
-Quiz-in-progress state (`currentIndex`, `answers`, `submitted`, `tab`) is **not** persisted.
 
 ## Git commit convention
 
@@ -60,15 +77,6 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 ```
 
 Types: `feat`, `fix`, `docs`, `refactor`, `chore`, `style`, `perf`, `test`, `ci`, `build`.
-
-- `feat` — new feature
-- `fix` — bug fix
-- `docs` — documentation changes
-- `refactor` — code refactoring (no behavior change)
-- `chore` — maintenance, dependencies, config
-- `style` — code formatting, CSS
-- `ci` — CI/CD
-- `build` — build system
 
 Scope (optional) is the affected file/directory. E.g. `feat(editor):`, `fix(quiz):`, `chore(deps):`.
 
