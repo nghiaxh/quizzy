@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { fireBig } from "../utils/confetti";
-import { RotateCcw, PenLine, CheckCircle2, XCircle, Eye } from "lucide-react";
+import { RotateCcw, PenLine, CheckCircle2, XCircle, Eye, RefreshCw } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation";
 
 export default function Result() {
-  const { questions, submitted, score, startQuiz, setTab, effectsEnabled } = useQuizStore();
+  const { questions, submitted, score, startQuiz, setTab, effectsEnabled, redoIncorrect } = useQuizStore();
   const { t } = useTranslation();
 
   const total = questions.length;
@@ -69,6 +69,12 @@ export default function Result() {
           <RotateCcw size={14} />
           {t("result.retry")}
         </button>
+        {wrong > 0 && (
+          <button className="flex items-center gap-1.5 btn btn-warning" onClick={redoIncorrect}>
+            <RefreshCw size={14} />
+            {t("result.redoIncorrect")}
+          </button>
+        )}
         <button className="flex items-center gap-1.5 btn btn-outline" onClick={() => setTab("review")}>
           <Eye size={14} />
           {t("result.review")}

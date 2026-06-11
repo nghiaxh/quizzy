@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useQuizStore } from "../store/quizStore";
-import { ChevronLeft, ChevronRight, CheckSquare, Timer } from "lucide-react";
+import { ChevronLeft, ChevronRight, CheckSquare, Timer, RefreshCw } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation";
 
 const LABELS = ["A", "B", "C", "D"];
@@ -26,7 +26,7 @@ function EmptyState() {
 }
 
 export default function Quiz() {
-  const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion, quizEndTime, submitAllAndFinish } = useQuizStore();
+  const { questions, currentIndex, answers, submitted, selectAnswer, nextQuestion, prevQuestion, quizEndTime, submitAllAndFinish, isRedoMode } = useQuizStore();
   const { t } = useTranslation();
   const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
@@ -128,7 +128,13 @@ export default function Quiz() {
     <div className="flex flex-col flex-1 overflow-hidden">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-2.5 border-b border-base-300 bg-base-100">
-        <div>
+        <div className="flex items-center gap-2">
+          {isRedoMode && (
+            <span className="badge badge-warning badge-sm gap-1 text-[10px]">
+              <RefreshCw size={10} />
+              {t("quiz.redoBadge")}
+            </span>
+          )}
           {timeLeft !== null && (
             <span className={`flex items-center gap-1 text-sm font-medium ${timeLeft <= 60 ? "text-error" : "text-base-content/60"}`}>
               <Timer size={14} />

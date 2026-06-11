@@ -58,6 +58,9 @@ interface QuizStore {
   quizEndTime: number | null;
   submitAllAndFinish: () => void;
 
+  isRedoMode: boolean;
+  redoIncorrect: () => void;
+
   language: Language;
   setLanguage: (lang: Language) => void;
 
@@ -150,6 +153,7 @@ export const useQuizStore = create<QuizStore>()(
           currentIndex: 0,
           answers: {},
           submitted: {},
+          isRedoMode: false,
           tab: "editor",
         });
       },
@@ -230,6 +234,7 @@ export const useQuizStore = create<QuizStore>()(
           answers: {},
           submitted: {},
           questions: questionsToUse,
+          isRedoMode: false,
         });
       },
 
@@ -241,7 +246,28 @@ export const useQuizStore = create<QuizStore>()(
           answers: {},
           submitted: {},
           questions: questionsToUse,
+          isRedoMode: false,
           quizEndTime: timerEnabled ? Date.now() + timerMinutes * 60 * 1000 : null,
+        });
+      },
+
+      isRedoMode: false,
+
+      redoIncorrect: () => {
+        const { questions, answers, submitted, shuffleQuestions, originalQuestions } = get();
+        const incorrectIds = questions
+          .filter((q) => submitted[q.id] && answers[q.id] !== q.correctIndex)
+          .map((q) => q.id);
+        const incorrectQuestions = originalQuestions.filter((q) => incorrectIds.includes(q.id));
+        const questionsToUse = shuffleQuestions ? shuffleArray(incorrectQuestions) : incorrectQuestions;
+        set({
+          questions: questionsToUse,
+          currentIndex: 0,
+          answers: {},
+          submitted: {},
+          isRedoMode: true,
+          quizEndTime: null,
+          tab: "quiz",
         });
       },
 

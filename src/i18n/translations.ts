@@ -67,6 +67,7 @@ const en = {
 
   "quiz.emptyTitle": "No questions",
   "quiz.emptyDesc": "Write questions in the Editor tab first",
+  "quiz.redoBadge": "Redoing incorrect",
   "quiz.prev": "Previous",
   "quiz.check": "Check",
   "quiz.viewResult": "View result",
@@ -81,6 +82,7 @@ const en = {
   "result.retry": "Retry",
   "result.review": "Review",
   "result.edit": "Edit",
+  "result.redoIncorrect": "Redo incorrect questions",
 
   "review.back": "Back",
 } as const;
@@ -154,6 +156,7 @@ const vi: Record<string, string> = {
 
   "quiz.emptyTitle": "Chưa có câu hỏi",
   "quiz.emptyDesc": "Soạn đề trong tab Editor trước nhé",
+  "quiz.redoBadge": "Làm lại câu sai",
   "quiz.prev": "Trước",
   "quiz.check": "Kiểm tra",
   "quiz.viewResult": "Xem kết quả",
@@ -168,6 +171,7 @@ const vi: Record<string, string> = {
   "result.retry": "Làm lại",
   "result.review": "Xem lại",
   "result.edit": "Sửa đề",
+  "result.redoIncorrect": "Làm lại câu sai",
 
   "review.back": "Quay lại",
 };
