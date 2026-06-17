@@ -9,9 +9,12 @@ npm install            # install JS deps
 npm run dev            # Vite dev server on port 5173
 npm run build          # tsc && vite build (type-check first, then bundle)
 npm run preview        # Vite preview of built dist/
+npm run test           # vitest (watch mode)
+npm run test:run       # vitest run (single pass)
+npm run test:coverage  # vitest run with coverage
 ```
 
-No linter, no test framework, no typecheck script. `npm run build` = the only CI gate.
+Linting: none. Testing: Vitest (colocated `*.test.ts`/`*.test.tsx`). `npm run build` = the only CI gate.
 
 ## App flow (5 tabs, no router)
 
