@@ -19,6 +19,9 @@ function resetStore() {
     timerMinutes: 10,
     quizEndTime: null,
     isRedoMode: false,
+    flashcardCurrentIndex: 0,
+    flashcardRatings: {},
+    flashcardRevealed: {},
     language: "en",
   });
   localStorage.clear();
@@ -213,6 +216,120 @@ describe("redoIncorrect", () => {
     expect(state.isRedoMode).toBe(true);
     expect(state.quizEndTime).toBeNull();
     expect(state.tab).toBe("quiz");
+  });
+});
+
+describe("flashcard flow", () => {
+  it("startFlashcards resets flashcard state", () => {
+    useQuizStore.setState({
+      questions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+      originalQuestions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+      shuffleQuestions: false,
+    });
+    useQuizStore.getState().startFlashcards();
+    const state = useQuizStore.getState();
+    expect(state.flashcardCurrentIndex).toBe(0);
+    expect(state.flashcardRatings).toEqual({});
+    expect(state.flashcardRevealed).toEqual({});
+  });
+
+  it("revealCard marks question as revealed", () => {
+    useQuizStore.setState({ questions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }] });
+    useQuizStore.getState().revealCard(0);
+    expect(useQuizStore.getState().flashcardRevealed[0]).toBe(true);
+  });
+
+  it("rateCard records rating", () => {
+    useQuizStore.setState({ questions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }] });
+    useQuizStore.getState().rateCard(0, true);
+    expect(useQuizStore.getState().flashcardRatings[0]).toBe(true);
+    useQuizStore.getState().rateCard(1, false);
+    expect(useQuizStore.getState().flashcardRatings[1]).toBe(false);
+  });
+
+  it("nextFlashcard advances index", () => {
+    useQuizStore.setState({
+      questions: [
+        { id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 },
+        { id: 1, text: "Q2", options: ["A", "B"], correctIndex: 0 },
+      ],
+      flashcardCurrentIndex: 0,
+    });
+    useQuizStore.getState().nextFlashcard();
+    expect(useQuizStore.getState().flashcardCurrentIndex).toBe(1);
+  });
+
+  it("nextFlashcard goes to flashcardResult on last card when all rated", () => {
+    useQuizStore.setState({
+      questions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+      flashcardCurrentIndex: 0,
+      flashcardRatings: { 0: true },
+    });
+    useQuizStore.getState().nextFlashcard();
+    expect(useQuizStore.getState().tab).toBe("flashcardResult");
+  });
+
+  it("prevFlashcard goes back", () => {
+    useQuizStore.setState({ flashcardCurrentIndex: 2 });
+    useQuizStore.getState().prevFlashcard();
+    expect(useQuizStore.getState().flashcardCurrentIndex).toBe(1);
+  });
+
+  it("prevFlashcard does not go below 0", () => {
+    useQuizStore.setState({ flashcardCurrentIndex: 0 });
+    useQuizStore.getState().prevFlashcard();
+    expect(useQuizStore.getState().flashcardCurrentIndex).toBe(0);
+  });
+
+  it("resetFlashcards resets ratings and revealed", () => {
+    useQuizStore.setState({
+      originalQuestions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+      flashcardCurrentIndex: 2,
+      flashcardRatings: { 0: true },
+      flashcardRevealed: { 0: true },
+    });
+    useQuizStore.getState().resetFlashcards();
+    const state = useQuizStore.getState();
+    expect(state.flashcardCurrentIndex).toBe(0);
+    expect(state.flashcardRatings).toEqual({});
+    expect(state.flashcardRevealed).toEqual({});
+  });
+
+  it("redoFlashcardMissed filters to only missed cards", () => {
+    useQuizStore.setState({
+      questions: [
+        { id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 },
+        { id: 1, text: "Q2", options: ["A", "B"], correctIndex: 0 },
+        { id: 2, text: "Q3", options: ["A", "B"], correctIndex: 0 },
+      ],
+      flashcardRatings: { 0: true, 1: false },
+      shuffleQuestions: false,
+    });
+    useQuizStore.getState().redoFlashcardMissed();
+    const state = useQuizStore.getState();
+    expect(state.questions).toHaveLength(1);
+    expect(state.questions[0].id).toBe(1);
+    expect(state.tab).toBe("flashcards");
+  });
+
+  it("redoFlashcardMissed does nothing when no missed cards", () => {
+    useQuizStore.setState({
+      questions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+      flashcardRatings: { 0: true },
+    });
+    useQuizStore.getState().redoFlashcardMissed();
+    expect(useQuizStore.getState().questions).toHaveLength(1);
+    expect(useQuizStore.getState().tab).not.toBe("flashcards");
+  });
+
+  it("setTab calls startFlashcards when switching to flashcards tab", () => {
+    useQuizStore.setState({
+      questions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+      originalQuestions: [{ id: 0, text: "Q1", options: ["A", "B"], correctIndex: 0 }],
+    });
+    useQuizStore.getState().setTab("flashcards");
+    expect(useQuizStore.getState().tab).toBe("flashcards");
+    expect(useQuizStore.getState().flashcardCurrentIndex).toBe(0);
   });
 });
 

@@ -59,7 +59,7 @@ D. Mars
 - [Zustand 5](https://zustand-demo.pmnd.rs) (state management, persisted to localStorage)
 - [Tailwind CSS 4](https://tailwindcss.com) + [DaisyUI 5](https://daisyui.com)
 - [canvas-confetti](https://github.com/catdad/canvas-confetti) – celebration effect
-- [Vite 7](https://vitejs.dev) – build tool
+- [Vite 8](https://vitejs.dev) – build tool
 - [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) – service worker, offline support
 - CI/CD: GitHub Pages deploy via GitHub Actions
 

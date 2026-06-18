@@ -23,15 +23,19 @@ beforeEach(() => {
     timerMinutes: 10,
     quizEndTime: null,
     isRedoMode: false,
+    flashcardCurrentIndex: 0,
+    flashcardRatings: {},
+    flashcardRevealed: {},
     language: "en",
   });
 });
 
-it("renders tab bar with Exams, Editor, Quiz tabs", () => {
+it("renders tab bar with Exams, Editor, Quiz, Flashcards tabs", () => {
   render(<App />);
   expect(screen.getByText("Exams")).toBeInTheDocument();
   expect(screen.getByText("Editor")).toBeInTheDocument();
   expect(screen.getByText("Quiz")).toBeInTheDocument();
+  expect(screen.getByText("Flashcards")).toBeInTheDocument();
 });
 
 it("shows exams page by default", () => {
@@ -61,6 +65,12 @@ it("quiz tab is disabled when no active exam", () => {
   expect(quizBtn).toBeDisabled();
 });
 
+it("flashcards tab is disabled when no active exam", () => {
+  render(<App />);
+  const flashcardsBtn = screen.getByText("Flashcards").closest("button");
+  expect(flashcardsBtn).toBeDisabled();
+});
+
 it("enables tabs when exam is active with questions", () => {
   useQuizStore.setState({
     activeExamId: "exam-1",
@@ -69,8 +79,10 @@ it("enables tabs when exam is active with questions", () => {
   render(<App />);
   const editorBtn = screen.getByText("Editor").closest("button");
   const quizBtn = screen.getByText("Quiz").closest("button");
+  const flashcardsBtn = screen.getByText("Flashcards").closest("button");
   expect(editorBtn).not.toBeDisabled();
   expect(quizBtn).not.toBeDisabled();
+  expect(flashcardsBtn).not.toBeDisabled();
 });
 
 it("switches tab on click", async () => {

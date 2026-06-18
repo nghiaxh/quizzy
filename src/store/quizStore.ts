@@ -5,7 +5,7 @@ import { fireCorrect } from "../utils/confetti";
 import type { Language } from "../i18n/translations";
 import { t } from "../i18n/translations";
 
-export type Tab = "exams" | "editor" | "quiz" | "result" | "review";
+export type Tab = "exams" | "editor" | "quiz" | "flashcards" | "flashcardResult" | "result" | "review";
 
 export interface Exam {
   id: string;
@@ -61,6 +61,17 @@ interface QuizStore {
   isRedoMode: boolean;
   redoIncorrect: () => void;
 
+  flashcardCurrentIndex: number;
+  flashcardRatings: Record<number, boolean>;
+  flashcardRevealed: Record<number, boolean>;
+  startFlashcards: () => void;
+  revealCard: (questionId: number) => void;
+  rateCard: (questionId: number, correct: boolean) => void;
+  nextFlashcard: () => void;
+  prevFlashcard: () => void;
+  resetFlashcards: () => void;
+  redoFlashcardMissed: () => void;
+
   language: Language;
   setLanguage: (lang: Language) => void;
 
@@ -88,10 +99,15 @@ export const useQuizStore = create<QuizStore>()(
     (set, get) => ({
       tab: "exams",
       setTab: (tab) => {
+        const state = get();
         if (tab === "quiz") {
-          const state = get();
           if (state.questions.length > 0) {
             state.startQuiz();
+          }
+        }
+        if (tab === "flashcards") {
+          if (state.questions.length > 0) {
+            state.startFlashcards();
           }
         }
         set({ tab });
@@ -153,6 +169,9 @@ export const useQuizStore = create<QuizStore>()(
           currentIndex: 0,
           answers: {},
           submitted: {},
+          flashcardCurrentIndex: 0,
+          flashcardRatings: {},
+          flashcardRevealed: {},
           isRedoMode: false,
           tab: "editor",
         });
@@ -268,6 +287,83 @@ export const useQuizStore = create<QuizStore>()(
           isRedoMode: true,
           quizEndTime: null,
           tab: "quiz",
+        });
+      },
+
+      flashcardCurrentIndex: 0,
+      flashcardRatings: {},
+      flashcardRevealed: {},
+
+      startFlashcards: () => {
+        const { originalQuestions, shuffleQuestions } = get();
+        const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
+        set({
+          questions: questionsToUse,
+          currentIndex: 0,
+          answers: {},
+          submitted: {},
+          isRedoMode: false,
+          flashcardCurrentIndex: 0,
+          flashcardRatings: {},
+          flashcardRevealed: {},
+        });
+      },
+
+      revealCard: (questionId) => {
+        set((s) => ({
+          flashcardRevealed: { ...s.flashcardRevealed, [questionId]: true },
+        }));
+      },
+
+      rateCard: (questionId, correct) => {
+        set((s) => ({
+          flashcardRatings: { ...s.flashcardRatings, [questionId]: correct },
+        }));
+      },
+
+      nextFlashcard: () => {
+        const { flashcardCurrentIndex, questions, flashcardRatings } = get();
+        const isLast = flashcardCurrentIndex === questions.length - 1;
+
+        if (isLast) {
+          const allRated = questions.every((q) => flashcardRatings[q.id] !== undefined);
+          if (allRated) set({ tab: "flashcardResult" });
+          return;
+        }
+
+        set({ flashcardCurrentIndex: flashcardCurrentIndex + 1 });
+      },
+
+      prevFlashcard: () => {
+        const { flashcardCurrentIndex } = get();
+        if (flashcardCurrentIndex > 0) set({ flashcardCurrentIndex: flashcardCurrentIndex - 1 });
+      },
+
+      resetFlashcards: () => {
+        const { originalQuestions, shuffleQuestions } = get();
+        const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
+        set({
+          questions: questionsToUse,
+          flashcardCurrentIndex: 0,
+          flashcardRatings: {},
+          flashcardRevealed: {},
+        });
+      },
+
+      redoFlashcardMissed: () => {
+        const { questions, flashcardRatings, shuffleQuestions } = get();
+        const missedIds = questions
+          .filter((q) => flashcardRatings[q.id] === false)
+          .map((q) => q.id);
+        if (missedIds.length === 0) return;
+        const missedQuestions = questions.filter((q) => missedIds.includes(q.id));
+        const questionsToUse = shuffleQuestions ? shuffleArray(missedQuestions) : missedQuestions;
+        set({
+          questions: questionsToUse,
+          flashcardCurrentIndex: 0,
+          flashcardRatings: {},
+          flashcardRevealed: {},
+          tab: "flashcards",
         });
       },
 
