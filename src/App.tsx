@@ -10,6 +10,13 @@ import SettingsModal from "./components/SettingsModal";
 import { PenLine, ClipboardList, Settings, LibraryBig, BookOpen } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "./i18n/useTranslation";
+import { AnimatePresence, motion } from "framer-motion";
+
+const pageVariants = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
 
 export default function App() {
   const { tab, setTab, questions, activeExamId } = useQuizStore();
@@ -68,13 +75,43 @@ export default function App() {
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">
-        {tab === "exams" && <ExamsPage />}
-        {tab === "editor" && <Editor />}
-        {tab === "quiz" && <Quiz />}
-        {tab === "flashcards" && <Flashcards />}
-        {tab === "flashcardResult" && <FlashcardResult />}
-        {tab === "result" && <Result />}
-        {tab === "review" && <Review />}
+        <AnimatePresence mode="wait">
+          {tab === "exams" && (
+            <motion.div key="exams" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <ExamsPage />
+            </motion.div>
+          )}
+          {tab === "editor" && (
+            <motion.div key="editor" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <Editor />
+            </motion.div>
+          )}
+          {tab === "quiz" && (
+            <motion.div key="quiz" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <Quiz />
+            </motion.div>
+          )}
+          {tab === "flashcards" && (
+            <motion.div key="flashcards" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <Flashcards />
+            </motion.div>
+          )}
+          {tab === "flashcardResult" && (
+            <motion.div key="flashcardResult" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <FlashcardResult />
+            </motion.div>
+          )}
+          {tab === "result" && (
+            <motion.div key="result" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <Result />
+            </motion.div>
+          )}
+          {tab === "review" && (
+            <motion.div key="review" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
+              <Review />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

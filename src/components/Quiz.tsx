@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { ChevronLeft, ChevronRight, CheckSquare, Timer, RefreshCw } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation";
+import { motion } from "framer-motion";
 
 const LABELS = ["A", "B", "C", "D"];
 
@@ -126,7 +127,6 @@ export default function Quiz() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-2.5 border-b border-base-300 bg-base-100">
         <div className="flex items-center gap-2">
           {isRedoMode && (
@@ -149,28 +149,42 @@ export default function Quiz() {
         <div />
       </div>
 
-      {/* Progress */}
       <div className="h-0.5 bg-base-200">
-        <div className="h-0.5 bg-primary transition-all duration-500 ease-out" style={{ width: `${progressPct}%` }} />
+        <motion.div
+          className="h-0.5 bg-primary"
+          animate={{ width: `${progressPct}%` }}
+          transition={{ duration: 0.3 }}
+        />
       </div>
 
-      {/* Question */}
       <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 py-8">
         <div className="w-full max-w-xl">
-          <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center whitespace-pre-line">{q.text}</p>
+          <motion.div
+            key={q.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center whitespace-pre-line">{q.text}</p>
 
-          <div className="flex flex-col gap-3">
-            {q.options.map((o, i) => (
-              <div key={i} className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 text-sm transition-all duration-150 ${isSubmitted ? "" : "cursor-pointer"} ${getOptionStyle(i)}`} onClick={() => !isSubmitted && selectAnswer(q.id, i, false)}>
-                <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-all ${getCircleStyle(i)}`}>{LABELS[i]}</span>
-                <span className="flex-1 leading-snug whitespace-pre-line">{o}</span>
-              </div>
-            ))}
-          </div>
+            <div className="flex flex-col gap-3">
+              {q.options.map((o, i) => (
+                <div
+                  key={i}
+                  className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 text-sm transition-colors duration-150 ${isSubmitted ? "" : "cursor-pointer"} ${getOptionStyle(i)}`}
+                  onClick={() => !isSubmitted && selectAnswer(q.id, i, false)}
+                >
+                  <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${getCircleStyle(i)}`}>
+                    {LABELS[i]}
+                  </span>
+                  <span className="flex-1 leading-snug whitespace-pre-line">{o}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </div>
 
-      {/* Footer */}
       <div className="px-6 py-4 border-t border-base-300 bg-base-100">
         <div className="flex items-center justify-center gap-3">
           <button className="flex items-center gap-2 btn btn-md btn-ghost" onClick={prevQuestion} disabled={currentIndex === 0}>
