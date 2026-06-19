@@ -1,41 +1,43 @@
-# Quizzy - Multiple choice exam tool
+# Quizzy
 
-Quizzy is a browser-based tool for creating and practicing multiple choice exams. Create exams, edit questions using a simple plain-text format, take quizzes, and view detailed results.
+A browser-based multiple choice exam and flashcard tool.
 
-**No backend, no database** — everything runs in your browser. Your data stays in `localStorage`.
-
-## How it works
+## Workflow
 
 ```
-Exams → Editor → Quiz → Result → Review
+Exams --> Editor --> Quiz --> Result --> Review
+                 --> Flashcards --> FlashcardResult --> Review
 ```
 
-1. **Exams** – Create or import an exam (a set of questions).
-2. **Editor** – Write questions in plain text, see a live preview. Auto-saves as you type.
-3. **Quiz** – Answer questions one by one. Get instant feedback (sound + confetti on correct). Optional timer.
-4. **Result** – See your score with an animated ring chart. Big confetti if ≥80%.
-5. **Review** – Scroll through all questions to see which were right/wrong.
-
-That's it. 5 tabs, no router, no page reloads.
+| Step | Description |
+|---|---|
+| **Exams** | Create, import, duplicate, rename, or delete exam question sets |
+| **Editor** | Write questions in plain text with live preview and auto-save |
+| **Quiz** | Answer questions sequentially with instant feedback, optional timer |
+| **Flashcards** | Flip through cards, reveal answers, rate "Got it" / "Still learning" |
+| **FlashcardResult** | Session summary with ring chart, got-it/missed counts, retry missed |
+| **Result** | View score via animated ring chart, confetti, and action buttons |
+| **Review** | Scroll through all questions with correct/wrong indicators per option |
 
 ## Features
 
-- **Manage multiple exams** – create, delete, rename, duplicate
-- **Question editor** with clear syntax and live preview
-- **Synced scrolling** between editor and preview panes
-- **Search questions** by content or number
-- **Practice mode** – answer one by one, check answers instantly
-- **Detailed results** – correct/wrong count, percentage, confetti animation
-- **Timer** – optional time limit per quiz
-- **Export / Import JSON** – save exams as JSON files for sharing
-- **Light / Dark mode**
-- **Multi-language** – English and Vietnamese (Tiếng Việt)
-- **PWA** – installable as a native app, works offline
-- **Responsive** – works on mobile and desktop
+- **Multiple exam management.** Create, delete, rename, duplicate any exam.
+- **Plain-text editor** with intuitive syntax and synchronized scroll preview.
+- **Instant feedback.** Correct answers trigger sound and confetti; wrong answers show the correct option.
+- **Flashcard mode.** Flip cards to reveal answers, rate as "Got it" or "Still learning".
+- **Timed mode.** Optional per-quiz countdown with auto-submit on expiry.
+- **Redo incorrect.** Retry only the quiz questions you got wrong.
+- **Redo missed flashcards.** Re-study only the cards you rated "Still learning".
+- **Export and Import JSON.** Share exams as portable JSON files.
+- **Accessibility.** Keyboard-navigable, screen-reader friendly controls.
+- **PWA.** Installable as a standalone app with offline support.
+- **Light and Dark** theme via DaisyUI.
+- **Multi-language.** English and Vietnamese (Tiếng Việt).
+- **Responsive.** Works on mobile and desktop.
 
 ## Question format
 
-Questions are separated by blank lines. `*` marks the correct answer.
+Questions are separated by blank lines. Prefix the correct option with `*`.
 
 ```
 1. What is 2+2?
@@ -51,38 +53,46 @@ C. Earth
 D. Mars
 ```
 
-2–4 options supported, multi-line text supported.
+2 to 4 options per question. Multi-line question text is supported.
 
 ## Tech stack
 
-- [React 19](https://react.dev) + TypeScript (strict mode)
-- [Zustand 5](https://zustand-demo.pmnd.rs) (state management, persisted to localStorage)
-- [Tailwind CSS 4](https://tailwindcss.com) + [DaisyUI 5](https://daisyui.com)
-- [canvas-confetti](https://github.com/catdad/canvas-confetti) – celebration effect
-- [Vite 8](https://vitejs.dev) – build tool
-- [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) – service worker, offline support
-- CI/CD: GitHub Pages deploy via GitHub Actions
+| Layer | Technology |
+|---|---|
+| Framework | React 19 + TypeScript (strict mode) |
+| State | Zustand 5 with `persist` middleware → `localStorage` |
+| Styling | Tailwind CSS 4 + DaisyUI 5 |
+| Build | Vite 7 |
+| PWA | `vite-plugin-pwa` (Workbox, offline caching) |
+| CI/CD | GitHub Actions → GitHub Pages |
+| Extras | `canvas-confetti`, `HTMLAudioElement` |
 
 ## Development
 
-### Prerequisites
-
-- Node.js >= 18
-
-### Setup
+**Prerequisites:** Node.js >= 18
 
 ```bash
 git clone https://github.com/nghiaxh/quizzy.git
 cd quizzy
 npm install
-npm run dev
+npm run dev      # → http://localhost:5173
 ```
 
-Open browser at `http://localhost:5173`.
-
-### Build
+**Build & preview:**
 
 ```bash
-npm run build
-npm run preview
+npm run build    # type-check + bundle
+npm run preview  # serve built output locally
 ```
+
+**Test:**
+
+```bash
+npm run test           # watch mode (Vitest)
+npm run test:run       # single pass
+npm run test:coverage  # with coverage report
+```
+
+## License
+
+MIT
