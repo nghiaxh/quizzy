@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import { useQuizStore } from "../store/quizStore";
 import { ChevronLeft, ChevronRight, Eye, ThumbsUp, ThumbsDown } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation";
-
-const LABELS = ["A", "B", "C", "D"];
+import { motion } from "framer-motion";
 
 function EmptyState() {
   const { t } = useTranslation();
@@ -35,7 +34,6 @@ export default function Flashcards() {
         if (!isRevealed) {
           state.revealCard(q.id);
         } else if (isRevealed && !isRated) {
-          // rating is done via buttons only
         } else if (isRated) {
           state.nextFlashcard();
         }
@@ -86,7 +84,6 @@ export default function Flashcards() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 py-2.5 border-b border-base-300 bg-base-100">
         <span className="text-sm font-semibold text-base-content/70">
           {t("flashcard.title")}
@@ -98,87 +95,87 @@ export default function Flashcards() {
         <div />
       </div>
 
-      {/* Progress */}
       <div className="h-0.5 bg-base-200">
-        <div className="h-0.5 bg-primary transition-all duration-500 ease-out" style={{ width: `${progressPct}%` }} />
+        <motion.div
+          className="h-0.5 bg-primary"
+          animate={{ width: `${progressPct}%` }}
+          transition={{ duration: 0.3 }}
+        />
       </div>
 
-      {/* Card area */}
       <div className="flex-1 overflow-y-auto flex flex-col items-center justify-center px-6 py-8">
         <div className="w-full max-w-xl">
-          {/* Card */}
-          <div
-            className={`relative bg-base-100 border-2 rounded-2xl p-8 transition-all duration-300 min-h-64 flex flex-col items-center justify-center cursor-pointer ${isRevealed ? (isRated ? (isCorrect ? "border-success bg-success/5" : "border-error bg-error/5") : "border-primary bg-primary/5") : "border-base-300 hover:border-primary/40 hover:shadow-md"}`}
-            onClick={() => !isRevealed && revealCard(q.id)}
-          >
-            {!isRevealed ? (
-              <div className="flex flex-col items-center gap-4 text-center">
-                <p className="text-lg font-semibold leading-relaxed text-base-content whitespace-pre-line">
-                  {q.text}
-                </p>
-                <span className="flex items-center gap-1.5 text-xs text-base-content/30 mt-4">
-                  <Eye size={14} />
-                  {t("flashcard.tapToReveal")}
-                </span>
-              </div>
-            ) : (
-              <div className="w-full text-center">
-                <p className="text-lg font-semibold leading-relaxed text-base-content mb-6 whitespace-pre-line">
-                  {q.text}
-                </p>
-                <div className="flex flex-col gap-2 max-w-sm mx-auto">
-                  {q.options.map((o, i) => {
-                    const isCorrectOpt = i === q.correctIndex;
-                    return (
-                      <div
-                        key={i}
-                        className={`flex items-center gap-3 px-4 py-3 rounded-xl border-2 text-sm transition-all ${
-                          isCorrectOpt
-                            ? "border-success bg-success/10 text-success"
-                            : "border-base-300 text-base-content/40 opacity-50"
-                        }`}
-                      >
-                        <span className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                          isCorrectOpt
-                            ? "bg-success text-white"
-                            : "bg-base-300 text-base-content/30"
-                        }`}>
-                          {LABELS[i]}
-                        </span>
-                        <span className="flex-1 leading-snug whitespace-pre-line">{o}</span>
-                      </div>
-                    );
-                  })}
+          <div className="relative" style={{ perspective: "1000px" }}>
+            <motion.div
+              className="relative w-full"
+              style={{ transformStyle: "preserve-3d" }}
+              animate={{ rotateY: isRevealed ? 180 : 0 }}
+              transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
+            >
+              <div
+                className="bg-base-100 border-2 border-primary rounded-2xl p-8 min-h-64 flex flex-col items-center justify-center cursor-pointer"
+                style={{ backfaceVisibility: "hidden" }}
+                onClick={() => !isRevealed && revealCard(q.id)}
+              >
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <p className="text-lg font-semibold leading-relaxed text-base-content whitespace-pre-line">
+                    {q.text}
+                  </p>
+                  <span className="flex items-center gap-1.5 text-xs text-base-content/30 mt-4">
+                    <Eye size={14} />
+                    {t("flashcard.tapToReveal")}
+                  </span>
                 </div>
               </div>
-            )}
+              <div
+                className="absolute inset-0 bg-base-100 border-2 border-primary rounded-2xl p-8 flex flex-col items-center justify-center"
+                style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+              >
+                <div className="flex flex-col items-center gap-3 text-center w-full">
+                  <p className="text-sm font-medium text-base-content/50 mb-1">
+                    {t("flashcard.title")}
+                  </p>
+                  <p className="text-xl font-bold leading-relaxed text-success whitespace-pre-line">
+                    {q.options[q.correctIndex]}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           </div>
 
-          {/* Rating buttons (after reveal, before rating) */}
           {isRevealed && !isRated && (
-            <div className="flex items-center justify-center gap-4 mt-6">
+            <motion.div
+              className="flex items-center justify-center gap-4 mt-6"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.2 }}
+            >
               <button
-                className="flex items-center gap-2 btn btn-lg btn-success px-8"
+                className="flex items-center gap-1.5 btn btn-sm btn-success"
                 onClick={() => rateCard(q.id, true)}
               >
-                <ThumbsUp size={18} />
+                <ThumbsUp size={14} />
                 {t("flashcard.gotIt")}
-                <span className="text-xs opacity-60 ml-1">(1)</span>
+                <span className="text-[10px] opacity-60">(1)</span>
               </button>
               <button
-                className="flex items-center gap-2 btn btn-lg btn-error px-8"
+                className="flex items-center gap-1.5 btn btn-sm btn-error"
                 onClick={() => rateCard(q.id, false)}
               >
-                <ThumbsDown size={18} />
+                <ThumbsDown size={14} />
                 {t("flashcard.stillLearning")}
-                <span className="text-xs opacity-60 ml-1">(2)</span>
+                <span className="text-[10px] opacity-60">(2)</span>
               </button>
-            </div>
+            </motion.div>
           )}
 
-          {/* Post-rating feedback */}
           {isRated && (
-            <div className="flex items-center justify-center mt-6">
+            <motion.div
+              className="flex items-center justify-center mt-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.15 }}
+            >
               <div className={`flex items-center gap-2 text-base font-semibold ${isCorrect ? "text-success" : "text-error"}`}>
                 {isCorrect ? (
                   <><ThumbsUp size={20} /> {t("flashcard.gotIt")}</>
@@ -186,12 +183,11 @@ export default function Flashcards() {
                   <><ThumbsDown size={20} /> {t("flashcard.stillLearning")}</>
                 )}
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
 
-      {/* Footer */}
       <div className="px-6 py-4 border-t border-base-300 bg-base-100">
         <div className="flex items-center justify-center gap-3">
           <button

@@ -74,6 +74,12 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
     onClose();
   };
 
+  const handleSelectForFlashcards = () => {
+    selectExam(exam.id);
+    setTab("flashcards");
+    onClose();
+  };
+
   const handleSelectForEditor = () => {
     selectExam(exam.id);
     setTab("editor");
@@ -222,6 +228,10 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
           <button className={`btn btn-sm ${questions.length > 0 ? "btn-primary" : "btn-disabled opacity-30"}`} onClick={handleSelectForQuiz} disabled={questions.length === 0}>
             <PlayCircle size={12} className="mr-1" />
             {t("exams.startQuiz")}
+          </button>
+          <button className={`btn btn-sm ${questions.length > 0 ? "btn-secondary" : "btn-disabled opacity-30"}`} onClick={handleSelectForFlashcards} disabled={questions.length === 0}>
+            <BookOpen size={12} className="mr-1" />
+            Flashcards
           </button>
         </div>
       </div>

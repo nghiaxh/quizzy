@@ -2,6 +2,7 @@
   "name": "quizzy",
   "private": true,
   "version": "0.4.0",
+  "description": "Browser-based multiple choice exam and flashcard tool",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,6 +16,7 @@
     "@tailwindcss/vite": "^4.3.1",
     "@testing-library/dom": "^10.4.1",
     "canvas-confetti": "^1.9.4",
+    "framer-motion": "^12.40.0",
     "lucide-react": "^1.14.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
