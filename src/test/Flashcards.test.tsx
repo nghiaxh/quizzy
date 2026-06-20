@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Flashcards from "./Flashcards";
+import Flashcards from "../components/Flashcards";
 import { useQuizStore } from "../store/quizStore";
 import type { Language } from "../i18n/translations";
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import confetti from "canvas-confetti";
-import { fireCorrect, fireBig } from "./confetti";
+import { fireCorrect, fireBig } from "../utils/confetti";
 
 const mockConfetti = vi.mocked(confetti);
 

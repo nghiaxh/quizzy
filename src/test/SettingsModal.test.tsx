@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import SettingsModal from "./SettingsModal";
+import SettingsModal from "../components/SettingsModal";
 import { useQuizStore } from "../store/quizStore";
 
 const defaultProps = {

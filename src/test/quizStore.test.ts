@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { useQuizStore } from "./quizStore";
+import { useQuizStore } from "../store/quizStore";
 
 function resetStore() {
   useQuizStore.setState({

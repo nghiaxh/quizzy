@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Result from "./Result";
+import Result from "../components/Result";
 import { useQuizStore } from "../store/quizStore";
 
 beforeEach(() => {

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Editor from "./Editor";
+import Editor from "../components/Editor";
 import { useQuizStore } from "../store/quizStore";
 
 const sampleText =

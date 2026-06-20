@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import Quiz from "./Quiz";
+import Quiz from "../components/Quiz";
 import { useQuizStore } from "../store/quizStore";
 
 const questions = [

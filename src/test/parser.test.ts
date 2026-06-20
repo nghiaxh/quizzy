@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseQuestions } from "./parser";
+import { parseQuestions } from "../utils/parser";
 
 describe("parseQuestions", () => {
   it("parses a single question with 4 options", () => {

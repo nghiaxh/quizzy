@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { t, en, vi } from "./translations";
+import { t, en, vi } from "../i18n/translations";
 
 describe("t()", () => {
   it("returns English translation for 'en'", () => {
