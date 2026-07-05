@@ -23,7 +23,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
             <Settings size={15} className="text-primary" />
             <span className="font-semibold text-sm">{t("settings.title")}</span>
           </div>
-          <button className="btn btn-ghost btn-xs btn-square" onClick={onClose}>
+          <button className="btn btn-ghost btn-sm btn-square" onClick={onClose}>
             <X size={14} />
           </button>
         </div>
@@ -50,7 +50,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
               <p className="text-sm font-medium">{t("settings.shuffle.label")}</p>
               <p className="text-xs text-base-content/40">{t("settings.shuffle.desc")}</p>
             </div>
-            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={shuffleQuestions} onChange={(e) => setShuffleQuestions(e.target.checked)} />
+            <input type="checkbox" className="toggle toggle-primary" checked={shuffleQuestions} onChange={(e) => setShuffleQuestions(e.target.checked)} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -58,7 +58,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
               <p className="text-sm font-medium">{t("settings.sound.label")}</p>
               <p className="text-xs text-base-content/40">{t("settings.sound.desc")}</p>
             </div>
-            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={soundEnabled} onChange={(e) => setSoundEnabled(e.target.checked)} />
+            <input type="checkbox" className="toggle toggle-primary" checked={soundEnabled} onChange={(e) => setSoundEnabled(e.target.checked)} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -66,7 +66,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
               <p className="text-sm font-medium">{t("settings.effects.label")}</p>
               <p className="text-xs text-base-content/40">{t("settings.effects.desc")}</p>
             </div>
-            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={effectsEnabled} onChange={(e) => setEffectsEnabled(e.target.checked)} />
+            <input type="checkbox" className="toggle toggle-primary" checked={effectsEnabled} onChange={(e) => setEffectsEnabled(e.target.checked)} />
           </div>
 
           <div className="flex items-center justify-between">
@@ -74,7 +74,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
               <p className="text-sm font-medium">{t("settings.timer.label")}</p>
               <p className="text-xs text-base-content/40">{t("settings.timer.desc")}</p>
             </div>
-            <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={timerEnabled} onChange={(e) => setTimerEnabled(e.target.checked)} />
+            <input type="checkbox" className="toggle toggle-primary" checked={timerEnabled} onChange={(e) => setTimerEnabled(e.target.checked)} />
           </div>
 
           {timerEnabled && (
@@ -84,7 +84,7 @@ export default function SettingsModal({ theme, setTheme, onClose }: SettingsModa
                 <p className="text-xs text-base-content/40">{t("settings.time.desc")}</p>
               </div>
               <div className="flex items-center gap-1">
-                <input type="number" className="input input-xs input-bordered w-16 text-center" min={1} max={180} value={timerMinutes} onChange={(e) => setTimerMinutes(Math.max(1, parseInt(e.target.value) || 1))} />
+                <input type="number" className="input input-sm input-bordered w-16 text-center" min={1} max={180} value={timerMinutes} onChange={(e) => setTimerMinutes(Math.max(1, parseInt(e.target.value) || 1))} />
                 <span className="text-xs text-base-content/40">{t("settings.time.unit")}</span>
               </div>
             </div>

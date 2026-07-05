@@ -119,9 +119,9 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
           <div className="flex-1 min-w-0">
@@ -137,10 +137,10 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
                     if (e.key === "Escape") setEditing(false);
                   }}
                 />
-                <button className="btn btn-xs btn-ghost btn-circle text-success" onClick={handleRename}>
+                <button className="btn btn-sm btn-ghost btn-circle text-success" onClick={handleRename}>
                   <Check size={12} />
                 </button>
-                <button className="btn btn-xs btn-ghost btn-circle text-error" onClick={() => setEditing(false)}>
+                <button className="btn btn-sm btn-ghost btn-circle text-error" onClick={() => setEditing(false)}>
                   <X size={12} />
                 </button>
               </div>
@@ -254,12 +254,12 @@ function NewExamModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 bg-base-100 border border-base-300 rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
           <span className="font-semibold text-sm">{t("exams.newExam")}</span>
-          <button className="btn btn-ghost btn-xs btn-circle" onClick={onClose}>
+          <button className="btn btn-ghost btn-sm btn-circle" onClick={onClose}>
             <X size={14} />
           </button>
         </div>
@@ -339,8 +339,8 @@ export default function ExamsPage() {
       <input type="file" accept=".json,.txt" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
 
       {/* Toolbar */}
-      <div className="flex items-center gap-3 px-5 py-3 bg-base-100 border-b border-base-300">
-        <input className="input input-sm input-bordered flex-1 max-w-xs text-xs" placeholder={t("exams.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
+      <div className="flex items-center gap-3 px-5 py-3 bg-base-100 border-b border-base-300 flex-wrap">
+        <input className="input input-sm input-bordered flex-1 min-w-0 max-w-xs text-xs" placeholder={t("exams.searchPlaceholder")} value={search} onChange={(e) => setSearch(e.target.value)} />
         <div className="ml-auto flex items-center gap-2">
           <button className="btn btn-outline btn-sm" onClick={handleImportClick}>
             <Upload size={13} className="mr-1" />

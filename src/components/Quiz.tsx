@@ -127,8 +127,8 @@ export default function Quiz() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-2.5 border-b border-base-300 bg-base-100">
-        <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-base-300 bg-base-100">
+        <div className="flex items-center gap-1 sm:gap-2">
           {isRedoMode && (
             <span className="badge badge-warning badge-sm gap-1 text-[10px]">
               <RefreshCw size={10} />
@@ -165,7 +165,7 @@ export default function Quiz() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center whitespace-pre-line">{q.text}</p>
+            <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center sm:text-left whitespace-pre-line">{q.text}</p>
 
             <div className="flex flex-col gap-3">
               {q.options.map((o, i) => (

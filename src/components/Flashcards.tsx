@@ -84,7 +84,7 @@ export default function Flashcards() {
 
   return (
     <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-2.5 border-b border-base-300 bg-base-100">
+      <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-base-300 bg-base-100">
         <span className="text-sm font-semibold text-base-content/70">
           {t("flashcard.title")}
         </span>

@@ -98,11 +98,11 @@ export default function Editor() {
         <div className="flex items-center justify-between px-4 py-2.5 bg-base-200 border-b border-base-300">
           <span className="text-xs font-medium text-base-content/50">{t("editor.title")}</span>
           <div className="flex items-center gap-1">
-            <button className="btn btn-xs btn-ghost text-secondary flex items-center gap-1" onClick={handleAddSample} title={t("editor.addSample")}>
+            <button className="btn btn-sm btn-ghost text-secondary flex items-center gap-1" onClick={handleAddSample} title={t("editor.addSample")}>
               <FileText size={13} />
               <span className="text-xs">{t("editor.addSample")}</span>
             </button>
-            <button className="btn btn-xs btn-ghost text-primary flex items-center gap-1" onClick={handleLoadSample} title={t("editor.loadSample")}>
+            <button className="btn btn-sm btn-ghost text-primary flex items-center gap-1" onClick={handleLoadSample} title={t("editor.loadSample")}>
               <FileText size={13} />
               <span className="text-xs">{t("editor.loadSample")}</span>
             </button>

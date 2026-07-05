@@ -47,7 +47,7 @@ export default function App() {
   const hasActiveExam = activeExamId !== null;
 
   return (
-    <div className="flex flex-col h-screen bg-base-100 overflow-hidden">
+    <div className="flex flex-col h-dvh bg-base-100 overflow-hidden">
       {showSettings && <SettingsModal theme={theme} setTheme={setTheme} onClose={() => setShowSettings(false)} />}
 
       {/* Tab bar */}

@@ -17,7 +17,7 @@ export default function FlashcardResult() {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-7 p-8">
       {/* Ring */}
-      <div className="relative flex items-center justify-center w-44 h-44">
+      <div className="relative flex items-center justify-center w-36 sm:w-44 h-36 sm:h-44">
         <svg className="absolute inset-0 -rotate-90" viewBox="0 0 120 120">
           <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="7" className="text-base-300" />
           <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={circumference * (1 - pct / 100)} className={ringColor} style={{ transition: "stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1)" }} />
@@ -47,7 +47,7 @@ export default function FlashcardResult() {
         ))}
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-center gap-2">
         <button className="flex items-center gap-1.5 btn btn-primary" onClick={() => { startFlashcards(); setTab("flashcards"); }}>
           <RotateCcw size={14} />
           {t("flashcardResult.retry")}
