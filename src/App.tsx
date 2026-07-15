@@ -11,6 +11,7 @@ import { PenLine, ClipboardList, Settings, LibraryBig, BookOpen } from "lucide-r
 import { useState, useEffect } from "react";
 import { useTranslation } from "./i18n/useTranslation";
 import { AnimatePresence, motion } from "framer-motion";
+import { getShareDataFromUrl, clearShareHash } from "./utils/share";
 
 const pageVariants = {
   initial: { opacity: 0 },
@@ -19,7 +20,7 @@ const pageVariants = {
 };
 
 export default function App() {
-  const { tab, setTab, questions, activeExamId } = useQuizStore();
+  const { tab, setTab, questions, activeExamId, createExam, selectExam } = useQuizStore();
   const [showSettings, setShowSettings] = useState(false);
   const { t } = useTranslation();
   const [theme, setThemeState] = useState<"light" | "dark">(() => {
@@ -41,6 +42,15 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
+  }, []);
+
+  useEffect(() => {
+    const shareData = getShareDataFromUrl();
+    if (shareData) {
+      const id = createExam(shareData.name || t("exams.sharedExam"), shareData.rawText);
+      selectExam(id);
+      clearShareHash();
+    }
   }, []);
 
   const hasQuestions = questions.length > 0;

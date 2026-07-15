@@ -1,8 +1,9 @@
 import { useQuizStore, Exam } from "../store/quizStore";
 import { parseQuestions } from "../utils/parser";
 import { useState, useRef, useCallback, ChangeEvent } from "react";
-import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Search, Download, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Copy, PlayCircle, BookOpen, Check, X, FileText, Clock, Search, Download, Upload, Share2 } from "lucide-react";
 import { useTranslation } from "../i18n/useTranslation";
+import { createShareUrl } from "../utils/share";
 
 function formatDate(ts: number, locale: string) {
   return new Intl.DateTimeFormat(locale === "vi" ? "vi-VN" : "en-US", {
@@ -45,6 +46,7 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
 
   const [searchTerm, setSearchTerm] = useState("");
   const [gotoInput, setGotoInput] = useState("");
+  const [showShare, setShowShare] = useState(false);
 
   const filteredQuestions = questions.filter((q, idx) => q.text.toLowerCase().includes(searchTerm.toLowerCase()) || (idx + 1).toString().includes(searchTerm));
 
@@ -120,6 +122,7 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {showShare && <ShareModal exam={exam} onClose={() => setShowShare(false)} />}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
       <div className="relative z-10 bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
         {/* Header */}
@@ -218,6 +221,10 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
             <Download size={12} className="mr-1" />
             {t("exams.saveExam")}
           </button>
+          <button className="btn btn-sm btn-ghost" onClick={() => setShowShare(true)}>
+            <Share2 size={12} className="mr-1" />
+            {t("exams.share")}
+          </button>
         </div>
 
         <div className="flex items-center justify-end p-3 gap-3 flex-wrap">
@@ -232,6 +239,38 @@ function ExamDetailModal({ exam, onClose }: { exam: Exam; onClose: () => void })
           <button className={`btn btn-sm ${questions.length > 0 ? "btn-secondary" : "btn-disabled opacity-30"}`} onClick={handleSelectForFlashcards} disabled={questions.length === 0}>
             <BookOpen size={12} className="mr-1" />
             Flashcards
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ShareModal({ exam, onClose }: { exam: Exam; onClose: () => void }) {
+  const { t } = useTranslation();
+  const url = createShareUrl(exam);
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative z-10 bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-base-300">
+          <span className="font-semibold text-sm">{t("exams.shareTitle")}</span>
+          <button className="btn btn-ghost btn-sm btn-circle" onClick={onClose}>
+            <X size={14} />
+          </button>
+        </div>
+        <div className="p-5 flex flex-col items-center gap-4">
+          <button className="btn btn-sm btn-outline w-full" onClick={handleCopy}>
+            {copied ? <Check size={12} className="mr-1" /> : <Copy size={12} className="mr-1" />}
+            {copied ? t("exams.copied") : t("exams.copyLink")}
           </button>
         </div>
       </div>

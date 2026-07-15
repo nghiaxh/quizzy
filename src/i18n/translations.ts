@@ -53,6 +53,11 @@ const en = {
   "exams.invalidTxt": "File does not contain valid questions.",
   "exams.defaultName": "New exam",
   "exams.copySuffix": "(copy)",
+  "exams.share": "Share",
+  "exams.shareTitle": "Share exam",
+  "exams.copyLink": "Copy link",
+  "exams.copied": "Copied!",
+  "exams.sharedExam": "Shared exam",
 
   "editor.title": "Write questions",
   "editor.addSample": "Add sample",
@@ -161,6 +166,11 @@ const vi: Record<string, string> = {
   "exams.invalidTxt": "File .txt không chứa câu hỏi hợp lệ.",
   "exams.defaultName": "Đề mới",
   "exams.copySuffix": "(bản sao)",
+  "exams.share": "Chia sẻ",
+  "exams.shareTitle": "Chia sẻ đề thi",
+  "exams.copyLink": "Sao chép link",
+  "exams.copied": "Đã sao chép!",
+  "exams.sharedExam": "Đề thi được chia sẻ",
 
   "editor.title": "Soạn câu hỏi",
   "editor.addSample": "Thêm câu mẫu",
