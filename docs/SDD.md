@@ -28,15 +28,13 @@ Browser
 ```
 App
   SettingsModal
-  TabBar (Exams | Editor | Quiz | Flashcards)
+  TabBar (Exams | Editor | Quiz)
   AnimatePresence (chuyển trang)
     ExamsPage
       NewExamModal
       ExamCard -> ExamDetailModal
     Editor (textarea + preview, cuộn đồng bộ)
     Quiz (thanh tiến trình, đồng hồ, thẻ câu hỏi, prev/check/next)
-    Flashcards (lật thẻ, hiện đáp án, nút đánh giá)
-    FlashcardResult (biểu đồ vòng tròn, các nút)
     Result (biểu đồ vòng tròn, confetti, các nút)
     Review (danh sách câu hỏi với chỉ thị đúng/sai)
 ```
@@ -49,9 +47,7 @@ App
 | `ExamsPage` | `exams` | Search term, modal state | CRUD, tìm kiếm |
 | `Editor` | `rawText`, `questions` | | Textarea + preview, cuộn đồng bộ |
 | `Quiz` | `questions`, `currentIndex`, `answers`... | | Hiển thị câu hỏi, phản hồi, đồng hồ |
-| `Flashcards` | `questions`, `flashcardRevealed`... | | Lật thẻ, hiện đáp án, đánh giá |
 | `Result` | `questions`, `answers`, `submitted` | | Tính điểm, biểu đồ, confetti |
-| `FlashcardResult` | `questions`, `flashcardRatings` | | Biểu đồ, tùy chọn học lại |
 | `Review` | `questions`, `answers`, `submitted` | Search term, goto | Xem lại câu hỏi dạng cuộn |
 | `SettingsModal` | `shuffleQuestions`, `soundEnabled`... | | Giao diện, công tắc, ngôn ngữ |
 
@@ -81,11 +77,6 @@ interface QuizStore {
   submitted: Record<number, boolean>;
   quizEndTime: number | null;
   isRedoMode: boolean;
-
-  // Trạng thái thẻ ghi nhớ
-  flashcardCurrentIndex: number;
-  flashcardRatings: Record<number, boolean>;
-  flashcardRevealed: Record<number, boolean>;
 
   // Cài đặt (được lưu)
   shuffleQuestions: boolean;
@@ -180,21 +171,7 @@ Trang kết quả
   biểu đồ vòng tròn SVG, nhận xét, confetti nếu >= 80%
 ```
 
-### 4.2 Luồng thẻ ghi nhớ
-
-```
-Người dùng bấm tab Flashcards
-  setTab("flashcards") -> startFlashcards()
-    xáo trộn? -> shuffleArray(questions[])
-
-Người dùng chạm thẻ -> revealCard(id) -> hiện đáp án
-Người dùng đánh giá -> Đã thuộc -> rateCard(id, true)
-                  -> Chưa thuộc -> rateCard(id, false)
-
-Thẻ cuối + đã đánh giá hết -> nextFlashcard() -> setTab("flashcardResult")
-```
-
-### 4.3 Xuất nhập
+### 4.2 Xuất nhập
 
 ```
 Xuất -> exportToFile()
@@ -221,8 +198,6 @@ Nhập -> importFromFile(file)
 | `selectAnswer(id, idx, confirm)` | Chọn + Kiểm tra | Hai pha: chọn rồi xác nhận. Phát âm thanh/confetti |
 | `submitAllAndFinish()` | Hết giờ | Điền câu chưa trả lời, sang kết quả |
 | `redoIncorrect()` | Nút trên Result | Lọc câu sai, bắt đầu bài thi nhỏ (không đồng hồ) |
-| `startFlashcards()` | Bấm tab Flashcards | Xáo trộn, reset trạng thái thẻ |
-| `redoFlashcardMissed()` | Nút trên FlashcardResult | Lọc thẻ "Chưa thuộc" |
 
 ### 5.2 Chọn đáp án hai pha
 

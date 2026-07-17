@@ -4,7 +4,7 @@
 
 | Tác nhân | Mô tả |
 |---|---|
-| **Học sinh** | Người dùng cuối tạo đề thi, luyện tập và học với thẻ ghi nhớ |
+| **Học sinh** | Người dùng cuối tạo đề thi và luyện tập |
 
 ---
 
@@ -232,85 +232,7 @@ sequenceDiagram
 
 ---
 
-## UC-07: Học với thẻ ghi nhớ
-
-**Tác nhân:** Học sinh
-
-**Điều kiện trước:** Đề thi có ít nhất một câu hỏi hợp lệ
-
-**Điều kiện sau:** Kết thúc phiên thẻ, hiển thị tổng kết
-
-**Luồng chính:**
-1. Học sinh bấm tab Flashcards
-2. Hệ thống xáo trộn câu hỏi (nếu bật)
-3. Hệ thống hiển thị câu hỏi đầu tiên dưới dạng thẻ
-4. Học sinh chạm thẻ, hệ thống hiện đáp án
-5. Học sinh đánh giá: "Đã thuộc" hoặc "Chưa thuộc"
-6. Học sinh bấm "Tiếp", hệ thống hiện thẻ tiếp theo
-7. Lặp lại bước 4 tới 6 cho tất cả thẻ
-8. Ở thẻ cuối, học sinh bấm "Xem tổng kết"
-9. Hệ thống hiển thị FlashcardResult với biểu đồ
-
-```mermaid
-sequenceDiagram
-    actor S as Hoc sinh
-    participant UI as Flashcards
-    participant Store as Zustand Store
-
-    S->>UI: Bấm tab Flashcards
-    UI->>Store: setTab("flashcards") -> startFlashcards()
-    Store-->>UI: questions[], reset state
-    loop Với mỗi thẻ
-        UI->>S: Hiện câu hỏi (ẩn đáp án)
-        S->>UI: Chạm thẻ
-        UI->>Store: revealCard(id)
-        UI->>S: Hiện đáp án
-        S->>UI: Đánh giá "Đã thuộc" / "Chưa thuộc"
-        UI->>Store: rateCard(id, boolean)
-        S->>UI: Bấm "Tiếp"
-        UI->>Store: nextFlashcard()
-        alt thẻ cuối + đã đánh giá hết
-            Store-->>UI: tab = "flashcardResult"
-        else
-            Store-->>UI: flashcardCurrentIndex++
-        end
-    end
-```
-
----
-
-## UC-08: Ôn lại câu chưa thuộc
-
-**Tác nhân:** Học sinh
-
-**Điều kiện trước:** Đã hoàn thành phiên thẻ, có ít nhất một thẻ "Chưa thuộc"
-
-**Điều kiện sau:** Phiên thẻ nhỏ chỉ gồm các thẻ chưa thuộc
-
-**Luồng chính:**
-1. Học sinh bấm "Ôn lại câu chưa thuộc" trên trang FlashcardResult
-2. Hệ thống lọc các thẻ đánh giá "Chưa thuộc"
-3. Hệ thống bắt đầu phiên thẻ chỉ với các thẻ đó
-4. Học sinh học như UC-07
-
-```mermaid
-sequenceDiagram
-    actor S as Hoc sinh
-    participant UI as FlashcardResult
-    participant Store as Zustand Store
-
-    S->>UI: Bấm "Ôn lại câu chưa thuộc"
-    UI->>Store: redoFlashcardMissed()
-    Store->>Store: Lọc thẻ rated false
-    Store-->>UI: tab = "flashcards"
-    S->>UI: Học thẻ chưa thuộc
-    UI->>Store: rateCard + nextFlashcard
-    Store-->>UI: tab = "flashcardResult" khi xong
-```
-
----
-
-## UC-09: Xuất đề thi
+## UC-07: Xuất đề thi
 
 **Tác nhân:** Học sinh
 
@@ -337,7 +259,7 @@ sequenceDiagram
 
 ---
 
-## UC-10: Nhập đề thi
+## UC-08: Nhập đề thi
 
 **Tác nhân:** Học sinh
 
@@ -375,7 +297,7 @@ sequenceDiagram
 
 ---
 
-## UC-11: Thay đổi cài đặt
+## UC-09: Thay đổi cài đặt
 
 **Tác nhân:** Học sinh
 
@@ -423,11 +345,9 @@ graph TD
     UC04["UC-04: Làm bài thi"]
     UC05["UC-05: Xem lại đáp án"]
     UC06["UC-06: Làm lại câu sai"]
-    UC07["UC-07: Học với thẻ ghi nhớ"]
-    UC08["UC-08: Ôn lại câu chưa thuộc"]
-    UC09["UC-09: Xuất đề thi"]
-    UC10["UC-10: Nhập đề thi"]
-    UC11["UC-11: Thay đổi cài đặt"]
+    UC07["UC-07: Xuất đề thi"]
+    UC08["UC-08: Nhập đề thi"]
+    UC09["UC-09: Thay đổi cài đặt"]
 
     HS --> UC01
     HS --> UC02
@@ -438,9 +358,6 @@ graph TD
     HS --> UC07
     HS --> UC08
     HS --> UC09
-    HS --> UC10
-    HS --> UC11
 
     UC04 -.->|mở rộng| UC06
-    UC07 -.->|mở rộng| UC08
 ```

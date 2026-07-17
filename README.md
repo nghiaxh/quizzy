@@ -1,12 +1,11 @@
 # Quizzy
 
-A browser-based multiple choice exam and flashcard tool.
+A browser-based multiple choice exam tool.
 
 ## Workflow
 
 ```
 Exams --> Editor --> Quiz --> Result --> Review
-                 --> Flashcards --> FlashcardResult --> Review
 ```
 
 | Step | Description |
@@ -14,8 +13,6 @@ Exams --> Editor --> Quiz --> Result --> Review
 | **Exams** | Create, import, duplicate, rename, or delete exam question sets |
 | **Editor** | Write questions in plain text with live preview and auto-save |
 | **Quiz** | Answer questions sequentially with instant feedback, optional timer |
-| **Flashcards** | Flip through cards, reveal answers, rate "Got it" / "Still learning" |
-| **FlashcardResult** | Session summary with ring chart, got-it/missed counts, retry missed |
 | **Result** | View score via animated ring chart, confetti, and action buttons |
 | **Review** | Scroll through all questions with correct/wrong indicators per option |
 
@@ -24,10 +21,8 @@ Exams --> Editor --> Quiz --> Result --> Review
 - **Multiple exam management.** Create, delete, rename, duplicate any exam.
 - **Plain-text editor** with intuitive syntax and synchronized scroll preview.
 - **Instant feedback.** Correct answers trigger sound and confetti; wrong answers show the correct option.
-- **Flashcard mode.** Flip cards to reveal answers, rate as "Got it" or "Still learning".
 - **Timed mode.** Optional per-quiz countdown with auto-submit on expiry.
 - **Redo incorrect.** Retry only the quiz questions you got wrong.
-- **Redo missed flashcards.** Re-study only the cards you rated "Still learning".
 - **Export and Import JSON.** Share exams as portable JSON files.
 - **Accessibility.** Keyboard-navigable, screen-reader friendly controls.
 - **PWA.** Installable as a standalone app with offline support.

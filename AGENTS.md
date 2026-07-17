@@ -39,7 +39,7 @@ App
 ├── NavTabs (exams | editor | quiz)
 ├── ExamsPage
 │   ├── NewExamModal
-│   └── ExamCard → ExamDetailModal (rename, delete, duplicate, edit, practice)
+│   └── ExamCard → ExamDetailModal (rename, delete, duplicate, edit, quiz)
 ├── Editor (textarea + preview, synced scroll)
 ├── Quiz (progress bar, timer, question card, prev/check/next, redo badge)
 ├── Result (ring chart, stats, action buttons)
