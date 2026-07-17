@@ -2,7 +2,7 @@
   "name": "quizzy",
   "private": true,
   "version": "0.4.0",
-  "description": "Browser-based multiple choice exam and flashcard tool",
+  "description": "Browser-based multiple choice exam tool",
   "type": "module",
   "scripts": {
     "dev": "vite",
