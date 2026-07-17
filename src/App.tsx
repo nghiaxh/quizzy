@@ -4,10 +4,8 @@ import Quiz from "./components/Quiz";
 import Result from "./components/Result";
 import Review from "./components/Review";
 import ExamsPage from "./components/ExamsPage";
-import Flashcards from "./components/Flashcards";
-import FlashcardResult from "./components/FlashcardResult";
 import SettingsModal from "./components/SettingsModal";
-import { PenLine, ClipboardList, Settings, LibraryBig, BookOpen } from "lucide-react";
+import { PenLine, ClipboardList, Settings, LibraryBig } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "./i18n/useTranslation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -31,7 +29,6 @@ export default function App() {
     { key: "exams" as const, label: t("app.tab.exams"), icon: LibraryBig },
     { key: "editor" as const, label: t("app.tab.editor"), icon: PenLine },
     { key: "quiz" as const, label: t("app.tab.quiz"), icon: ClipboardList },
-    { key: "flashcards" as const, label: t("app.tab.flashcards"), icon: BookOpen },
   ] as const;
 
   const setTheme = (th: "light" | "dark") => {
@@ -64,11 +61,11 @@ export default function App() {
       <div className="flex items-center justify-between px-4 py-2 bg-base-200 border-b border-base-300">
         <div className="flex items-center gap-1 bg-base-300/50 rounded-xl p-1">
           {TABS.map((tabItem) => {
-            const disabled = (tabItem.key === "editor" && !hasActiveExam) || ((tabItem.key === "quiz" || tabItem.key === "flashcards") && (!hasActiveExam || !hasQuestions));
+            const disabled = (tabItem.key === "editor" && !hasActiveExam) || (tabItem.key === "quiz" && (!hasActiveExam || !hasQuestions));
             const Icon = tabItem.icon;
             const isActive = tab === tabItem.key;
             return (
-              <button key={tabItem.key} onClick={() => !disabled && setTab(tabItem.key)}               disabled={disabled} title={tabItem.key === "editor" && disabled ? t("app.editorDisabled") : (tabItem.key === "quiz" || tabItem.key === "flashcards") && disabled ? t("app.quizDisabled") : undefined} className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
+              <button key={tabItem.key} onClick={() => !disabled && setTab(tabItem.key)}               disabled={disabled} title={tabItem.key === "editor" && disabled ? t("app.editorDisabled") : tabItem.key === "quiz" && disabled ? t("app.quizDisabled") : undefined} className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
                 <Icon size={13} />
                 {tabItem.label}
               </button>
@@ -99,16 +96,6 @@ export default function App() {
           {tab === "quiz" && (
             <motion.div key="quiz" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
               <Quiz />
-            </motion.div>
-          )}
-          {tab === "flashcards" && (
-            <motion.div key="flashcards" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <Flashcards />
-            </motion.div>
-          )}
-          {tab === "flashcardResult" && (
-            <motion.div key="flashcardResult" className="flex flex-1" variants={pageVariants} initial="initial" animate="animate" exit="exit">
-              <FlashcardResult />
             </motion.div>
           )}
           {tab === "result" && (
