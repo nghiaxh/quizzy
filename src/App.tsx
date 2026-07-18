@@ -46,6 +46,7 @@ export default function App() {
     if (shareData) {
       const id = createExam(shareData.name || t("exams.sharedExam"), shareData.rawText);
       selectExam(id);
+      setTab("quiz");
       clearShareHash();
     }
   }, []);
