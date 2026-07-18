@@ -111,6 +111,11 @@ export const useQuizStore = create<QuizStore>()(
       activeExamId: null,
 
       createExam: (name, rawText = "") => {
+        const trimmed = rawText.trim();
+        if (trimmed) {
+          const existing = get().exams.find((e) => e.rawText.trim() === trimmed);
+          if (existing) return existing.id;
+        }
         const id = genId();
         const exam: Exam = {
           id,
