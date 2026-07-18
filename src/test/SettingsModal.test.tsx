@@ -25,7 +25,7 @@ it("renders all settings sections", () => {
   render(<SettingsModal {...defaultProps} />);
   expect(screen.getByText("Settings")).toBeInTheDocument();
   expect(screen.getByText("Theme")).toBeInTheDocument();
-  expect(screen.getByText("Shuffle questions")).toBeInTheDocument();
+  expect(screen.getByText("Shuffle questions & answers")).toBeInTheDocument();
   expect(screen.getByText("Sound")).toBeInTheDocument();
   expect(screen.getByText("Effects")).toBeInTheDocument();
   expect(screen.getByText("Timer")).toBeInTheDocument();

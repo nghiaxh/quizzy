@@ -83,6 +83,16 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+function shuffleQuestionOptions(q: Question): Question {
+  const indices = q.options.map((_, i) => i);
+  const shuffledIndices = shuffleArray(indices);
+  return {
+    ...q,
+    options: shuffledIndices.map((i) => q.options[i]),
+    correctIndex: shuffledIndices.indexOf(q.correctIndex),
+  };
+}
+
 export const useQuizStore = create<QuizStore>()(
   persist(
     (set, get) => ({
@@ -228,7 +238,9 @@ export const useQuizStore = create<QuizStore>()(
 
       resetQuiz: () => {
         const { originalQuestions, shuffleQuestions } = get();
-        const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
+        const questionsToUse = shuffleQuestions
+          ? shuffleArray(originalQuestions).map(shuffleQuestionOptions)
+          : originalQuestions;
         set({
           currentIndex: 0,
           answers: {},
@@ -240,7 +252,9 @@ export const useQuizStore = create<QuizStore>()(
 
       startQuiz: () => {
         const { originalQuestions, shuffleQuestions, timerEnabled, timerMinutes } = get();
-        const questionsToUse = shuffleQuestions ? shuffleArray(originalQuestions) : originalQuestions;
+        const questionsToUse = shuffleQuestions
+          ? shuffleArray(originalQuestions).map(shuffleQuestionOptions)
+          : originalQuestions;
         set({
           currentIndex: 0,
           answers: {},
@@ -259,7 +273,9 @@ export const useQuizStore = create<QuizStore>()(
           .filter((q) => submitted[q.id] && answers[q.id] !== q.correctIndex)
           .map((q) => q.id);
         const incorrectQuestions = originalQuestions.filter((q) => incorrectIds.includes(q.id));
-        const questionsToUse = shuffleQuestions ? shuffleArray(incorrectQuestions) : incorrectQuestions;
+        const questionsToUse = shuffleQuestions
+          ? shuffleArray(incorrectQuestions).map(shuffleQuestionOptions)
+          : incorrectQuestions;
         set({
           questions: questionsToUse,
           currentIndex: 0,
