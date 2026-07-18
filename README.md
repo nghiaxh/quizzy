@@ -24,6 +24,7 @@ Exams --> Editor --> Quiz --> Result --> Review
 - **Timed mode.** Optional per-quiz countdown with auto-submit on expiry.
 - **Redo incorrect.** Retry only the quiz questions you got wrong.
 - **Export and Import JSON.** Share exams as portable JSON files.
+- **Share link.** Generate compressed URL with exam data embedded — no backend needed.
 - **Accessibility.** Keyboard-navigable, screen-reader friendly controls.
 - **PWA.** Installable as a standalone app with offline support.
 - **Light and Dark** theme via DaisyUI.

@@ -58,6 +58,7 @@ App
 - CI: GitHub Pages deploy via `.github/workflows/deploy.yml` on push to `main`
 - Confetti: `canvas-confetti` (small burst per correct answer, big burst if ≥80%)
 - Sound: `HTMLAudioElement` (`./correct.mp3`)
+- Share: compact binary format + `fflate` deflate → base64url in URL hash fragment (`#share=`)
 
 ## State management (Zustand)
 
@@ -104,6 +105,21 @@ Two `Question` types exist. The **parser's** type is the runtime source of truth
 |---|---|---|
 | `src/utils/parser.ts` (used) | `number` | `string[]` |
 | `src/types.ts` (unused/legacy) | `string` | `Option[]` (objects) |
+
+## Share flow
+
+Sharing uses URL hash fragment (`#share=<compressed>`). No backend needed.
+
+**Encode:** `rawText` → `parseQuestions()` → compact format (`\x00`/`\x01` separated) → `fflate` deflate → base64url
+
+**Decode:** base64url → inflate → compact format → reconstruct rawText → parser produces identical questions
+
+Compact format spec:
+```
+name\x01text\x00correctIdx\x00opt1\x00opt2[\x00opt3[\x00opt4]]\x01...
+```
+
+Implementation: `src/utils/share.ts`. External API unchanged: `createShareUrl()`, `getShareDataFromUrl()`, `clearShareHash()`.
 
 ## Quiz flow details
 
