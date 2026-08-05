@@ -57,7 +57,7 @@ it("updates preview when typing", async () => {
 it("adds a sample question on button click", async () => {
   const user = userEvent.setup();
   render(<Editor />);
-  await user.click(screen.getByTitle("Add sample"));
+  await user.click(screen.getByRole("button", { name: "Add sample" }));
   const previewMatches = screen.getAllByText(/Question content/);
   expect(previewMatches.length).toBeGreaterThanOrEqual(1);
 });
@@ -65,7 +65,7 @@ it("adds a sample question on button click", async () => {
 it("loads sample exam on button click", async () => {
   const user = userEvent.setup();
   const { container } = render(<Editor />);
-  await user.click(screen.getByTitle("Load sample exam"));
+  await user.click(screen.getByRole("button", { name: "Load sample exam" }));
   const textarea = container.querySelector("textarea")!;
   expect(textarea.value).toContain("Question content");
 });

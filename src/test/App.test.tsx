@@ -41,12 +41,9 @@ it("shows exams page by default", () => {
 
 it("settings button opens settings modal", async () => {
   const user = userEvent.setup();
-  const { container } = render(<App />);
-  const settingsBtn = container.querySelector('[class*="btn-circle"]');
-  if (settingsBtn) {
-    await user.click(settingsBtn);
-    expect(screen.getByText("Settings")).toBeInTheDocument();
-  }
+  render(<App />);
+  await user.click(screen.getByRole("button", { name: "Settings" }));
+  expect(screen.getByText("Settings")).toBeInTheDocument();
 });
 
 it("editor tab is disabled when no active exam", () => {

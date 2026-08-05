@@ -35,19 +35,15 @@ it("renders all settings sections", () => {
 it("calls setTheme when toggling theme", async () => {
   const setTheme = vi.fn();
   const user = userEvent.setup();
-  const { container } = render(<SettingsModal {...defaultProps} setTheme={setTheme} />);
-  const themeGroup = container.querySelector('[class*="bg-base-200 rounded-lg"]');
-  const darkBtn = themeGroup?.querySelector("button:last-child");
-  if (darkBtn) {
-    await user.click(darkBtn);
-    expect(setTheme).toHaveBeenCalledWith("dark");
-  }
+  render(<SettingsModal {...defaultProps} setTheme={setTheme} />);
+  await user.click(screen.getByRole("button", { name: "Dark" }));
+  expect(setTheme).toHaveBeenCalledWith("dark");
 });
 
 it("toggles shuffle switch", async () => {
   const user = userEvent.setup();
   render(<SettingsModal {...defaultProps} />);
-  const toggles = screen.getAllByRole("checkbox");
+  const toggles = screen.getAllByRole("switch");
   await user.click(toggles[0]);
   expect(useQuizStore.getState().shuffleQuestions).toBe(true);
 });
@@ -55,17 +51,17 @@ it("toggles shuffle switch", async () => {
 it("toggles sound switch", async () => {
   const user = userEvent.setup();
   render(<SettingsModal {...defaultProps} />);
-  const toggles = screen.getAllByRole("checkbox");
+  const toggles = screen.getAllByRole("switch");
   await user.click(toggles[1]);
   expect(useQuizStore.getState().soundEnabled).toBe(false);
 });
 
 it("shows timer minutes input when timer enabled", async () => {
   const user = userEvent.setup();
-  const { container } = render(<SettingsModal {...defaultProps} />);
-  const toggles = screen.getAllByRole("checkbox");
+  render(<SettingsModal {...defaultProps} />);
+  const toggles = screen.getAllByRole("switch");
   await user.click(toggles[3]);
-  const timerInput = container.querySelector('input[type="number"]');
+  const timerInput = screen.getByLabelText("Time limit");
   expect(timerInput).toBeInTheDocument();
   expect(timerInput).toHaveValue(10);
 });
@@ -81,11 +77,7 @@ it("changes language", async () => {
 it("calls onClose when close button clicked", async () => {
   const onClose = vi.fn();
   const user = userEvent.setup();
-  const { container } = render(<SettingsModal {...defaultProps} onClose={onClose} />);
-  const header = container.querySelector('[class*="sticky top-0"]');
-  const closeBtn = header?.querySelector("button");
-  if (closeBtn) {
-    await user.click(closeBtn);
-    expect(onClose).toHaveBeenCalled();
-  }
+  render(<SettingsModal {...defaultProps} onClose={onClose} />);
+  await user.click(screen.getByRole("button", { name: "Close" }));
+  expect(onClose).toHaveBeenCalled();
 });
