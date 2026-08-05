@@ -35,7 +35,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ["**/*.{js,css,html,png,svg,mp3}"],
+        globPatterns: ["**/*.{js,css,html,png,svg,mp3,woff2}"],
         runtimeCaching: [
           {
             urlPattern: /^https?:\/\/.*/i,
@@ -52,6 +52,17 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes("node_modules/framer-motion")) return "framer-motion";
+          if (id.includes("node_modules/@heroui") || id.includes("node_modules/react-aria-components") || id.includes("node_modules/react-stately") || id.includes("node_modules/@react-aria") || id.includes("node_modules/@react-stately") || id.includes("node_modules/@react-types") || id.includes("node_modules/@react-spectrum") || id.includes("node_modules/react-aria")) return "heroui";
+          if (id.includes("node_modules/@phosphor-icons")) return "phosphor-icons";
+        },
+      },
+    },
+  },
   test: {
     environment: "jsdom",
     setupFiles: "./src/test-setup.ts",
