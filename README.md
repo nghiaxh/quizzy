@@ -27,7 +27,7 @@ Exams --> Editor --> Quiz --> Result --> Review
 - **Share link.** Generate compressed URL with exam data embedded — no backend needed.
 - **Accessibility.** Keyboard-navigable, screen-reader friendly controls.
 - **PWA.** Installable as a standalone app with offline support.
-- **Light and Dark** theme via DaisyUI.
+- **Light and Dark** theme with warm editorial monochrome tokens (HeroUI CSS-first).
 - **Multi-language.** English and Vietnamese (Tiếng Việt).
 - **Responsive.** Works on mobile and desktop.
 
@@ -57,7 +57,9 @@ D. Mars
 |---|---|
 | Framework | React 19 + TypeScript (strict mode) |
 | State | Zustand 5 with `persist` middleware → `localStorage` |
-| Styling | Tailwind CSS 4 + DaisyUI 5 |
+| UI | HeroUI v3 (CSS-first, no provider) + Tailwind CSS 4 |
+| Design | Warm editorial monochrome; Geist / Newsreader / Geist Mono fonts |
+| Icons | `@phosphor-icons/react` |
 | Build | Vite 7 |
 | PWA | `vite-plugin-pwa` (Workbox, offline caching) |
 | CI/CD | GitHub Actions → GitHub Pages |

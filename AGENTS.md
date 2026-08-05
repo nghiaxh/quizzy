@@ -32,33 +32,57 @@ Tab navigation is just `zustand` state (`tab: "exams" | "editor" | "quiz" | "res
 | **result** | Score ring chart, confetti, retry/review/edit/redo-incorrect buttons |
 | **review** | Scroll through all questions with correct/wrong indicators |
 
-## Component tree
-
-```
-App
-├── NavTabs (exams | editor | quiz)
-├── ExamsPage
-│   ├── NewExamModal
-│   └── ExamCard → ExamDetailModal (rename, delete, duplicate, edit, quiz)
-├── Editor (textarea + preview, synced scroll)
-├── Quiz (progress bar, timer, question card, prev/check/next, redo badge)
-├── Result (ring chart, stats, action buttons)
-├── Review (question list with correct/wrong labels)
-└── SettingsModal (theme, shuffle, sound, effects, timer, language)
-```
-
 ## Stack
 
 - React 19 + TypeScript (strict, noUnusedLocals, noUnusedParameters)
 - Vite 7 + `@vitejs/plugin-react`
-- Tailwind CSS 4 (`@import "tailwindcss"` in `index.css`) + DaisyUI 5.5 (`@plugin "daisyui"`)
+- HeroUI v3 (`@heroui/react` + `@heroui/styles`, CSS-first, no provider) + Tailwind CSS 4 (`@import "@heroui/styles"` in `src/index.css`)
+- Icons: `@phosphor-icons/react` (no Lucide)
+- Fonts: `@fontsource-variable/geist` (sans), `geist-mono` (mono), `newsreader` (serif, + `wght-italic`) — imported in `src/main.tsx`
 - State: Zustand 5.12 with `persist` middleware → `localStorage` key `quizzy-storage`
 - i18n: simple key-based system in `src/i18n/` (English default, Vietnamese supported)
-- PWA: `vite-plugin-pwa` (Workbox-based service worker, precaches static assets, offline support)
+- PWA: `vite-plugin-pwa` (Workbox-based service worker, precaches static assets incl. `woff2`, offline support)
 - CI: GitHub Pages deploy via `.github/workflows/deploy.yml` on push to `main`
 - Confetti: `canvas-confetti` (small burst per correct answer, big burst if ≥80%)
 - Sound: `HTMLAudioElement` (`./correct.mp3`)
 - Share: compact binary format + `fflate` deflate → base64url in URL hash fragment (`#share=`)
+
+## Design system
+
+Warm editorial monochrome. Light + dark themes are HeroUI CSS token overrides in `src/index.css`.
+
+**Tokens** (CSS variables in `:root`/`[data-theme="dark"]`, exposed as Tailwind utilities via `@theme inline` in HeroUI styles):
+canvas `--background` `#fbfbfa`, cards `--surface` `#ffffff`, muted fills `--surface-secondary`/`--surface-tertiary`, dividers `--border`/`--separator`, charcoal text `--foreground`, muted `--muted`, primary CTA `--accent` `#111111` (light) / `#f2efea` (dark), status `--success` `--warning` `--danger`, fields `--field-*`, modal `--overlay` + `--backdrop`.
+
+**Typography:** body `font-sans` (Geist), headings/logo/exam titles/verdict `font-serif` (Newsreader), option letters/question numbers/timer/counts/mono metadata `font-mono` (Geist Mono).
+
+**Rules:** flat cards with crisp small radii (`rounded-lg`/`rounded-xl`), no heavy shadows (`shadow-md+`), no gradients/glass, no `rounded-full` on large elements, quiet motion. Use `bg-surface border border-border`, `bg-surface-secondary/tertiary`, `text-muted/foreground`, `bg-accent text-accent-foreground`, `divide-separator`.
+
+**HeroUI specifics:**
+- No provider or theme config needed; just `@import "@heroui/styles"` + token overrides.
+- Dark mode via `data-theme="dark"` on `<html>` (App sets it from `localStorage["theme"]`).
+- Buttons: base class `button` (overridden to `--radius-lg`), variants `primary|secondary|tertiary|ghost|outline|danger|danger-soft`, sizes `lg|md|sm`, props `isIconOnly`, `isDisabled`, `fullWidth`.
+- Modals: compound `Modal` with `.Backdrop/.Container/.Dialog/.Header/.Body/.Footer/.Heading/.CloseTrigger`; `Container` accepts `size` + `scroll="inside"`; `CloseTrigger` is already a `CloseButton` (don't nest buttons). Renders into a **portal** — tests must use `screen`, not `container` queries.
+  - Programmatic modals: wrap in `AppModal` (`src/components/AppModal.tsx`), which renders `Modal.Root state={useOverlayState({ defaultOpen: true })}` and wires `onOpenChange(false)` → `onClose()`. Don't inject `OverlayTriggerStateContext` by hand or skip `Modal.Root` — that leaves the dialog unpainted behind the dimmed backdrop. `Modal.Root` wraps children in a RAC `DialogTrigger`, so give it a hidden disabled `Button` trigger child to register a pressable; otherwise RAC logs a dev-only "PressResponder without a pressable child" warning.
+- Switch: compound `Root/Content/Control/Thumb`, `size="sm"`, controlled via `isSelected` + `onChange` (not `onValueChange`).
+- Input: `@heroui/react` `Input` is a bare RAC input (no start/end content); wrap icons in an absolutely-positioned element.
+- Color utilities: `bg-accent text-accent-foreground`, `text-muted`, `bg-surface-secondary`, `border-border`, `text-success/warning/danger`, `bg-danger/10` etc.
+
+## Component tree
+
+```
+App
+├── Header (Quizzy serif logo, pill NavTabs exams | editor | quiz, settings Button)
+├── ExamsPage
+│   ├── NewExamModal (HeroUI Modal)
+│   ├── ExamCard → ExamDetailModal (rename, delete, duplicate, edit, quiz, share)
+│   └── ShareModal (HeroUI Modal)
+├── Editor (textarea + preview, synced scroll)
+├── Quiz (progress bar, timer, question card, prev/check/next, redo badge)
+├── Result (ring chart, stats, action buttons)
+├── Review (question list with correct/wrong labels)
+└── SettingsModal (HeroUI Modal; theme, shuffle, sound, effects, timer, language)
+```
 
 ## State management (Zustand)
 
