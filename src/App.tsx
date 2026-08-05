@@ -5,7 +5,8 @@ import Result from "./components/Result";
 import Review from "./components/Review";
 import ExamsPage from "./components/ExamsPage";
 import SettingsModal from "./components/SettingsModal";
-import { PenLine, ClipboardList, Settings, LibraryBig } from "lucide-react";
+import { Button } from "@heroui/react";
+import { Books, ClipboardText, PencilSimple, Gear } from "@phosphor-icons/react";
 import { useState, useEffect } from "react";
 import { useTranslation } from "./i18n/useTranslation";
 import { AnimatePresence, motion } from "framer-motion";
@@ -26,9 +27,9 @@ export default function App() {
   });
 
   const TABS = [
-    { key: "exams" as const, label: t("app.tab.exams"), icon: LibraryBig },
-    { key: "editor" as const, label: t("app.tab.editor"), icon: PenLine },
-    { key: "quiz" as const, label: t("app.tab.quiz"), icon: ClipboardList },
+    { key: "exams" as const, label: t("app.tab.exams"), icon: Books },
+    { key: "editor" as const, label: t("app.tab.editor"), icon: PencilSimple },
+    { key: "quiz" as const, label: t("app.tab.quiz"), icon: ClipboardText },
   ] as const;
 
   const setTheme = (th: "light" | "dark") => {
@@ -39,7 +40,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-  }, []);
+  }, [theme]);
 
   useEffect(() => {
     const shareData = getShareDataFromUrl();
@@ -49,37 +50,37 @@ export default function App() {
       setTab("quiz");
       clearShareHash();
     }
-  }, []);
+  }, [createExam, selectExam, setTab, t]);
 
   const hasQuestions = questions.length > 0;
   const hasActiveExam = activeExamId !== null;
 
   return (
-    <div className="flex flex-col h-dvh bg-base-100 overflow-hidden">
+    <div className="flex flex-col h-dvh bg-background overflow-hidden">
       {showSettings && <SettingsModal theme={theme} setTheme={setTheme} onClose={() => setShowSettings(false)} />}
 
-      {/* Tab bar */}
-      <div className="flex items-center justify-between px-4 py-2 bg-base-200 border-b border-base-300">
-        <div className="flex items-center gap-1 bg-base-300/50 rounded-xl p-1">
+      {/* Header */}
+      <header className="flex items-center justify-between gap-3 px-4 sm:px-6 h-14 shrink-0 border-b border-separator bg-surface">
+        <span className="text-2xl tracking-tight text-foreground select-none"></span>
+
+        <nav className="flex items-center gap-1 p-1 bg-surface-secondary border border-border rounded-lg">
           {TABS.map((tabItem) => {
             const disabled = (tabItem.key === "editor" && !hasActiveExam) || (tabItem.key === "quiz" && (!hasActiveExam || !hasQuestions));
             const Icon = tabItem.icon;
             const isActive = tab === tabItem.key;
             return (
-              <button key={tabItem.key} onClick={() => !disabled && setTab(tabItem.key)}               disabled={disabled} title={tabItem.key === "editor" && disabled ? t("app.editorDisabled") : tabItem.key === "quiz" && disabled ? t("app.quizDisabled") : undefined} className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer whitespace-nowrap ${isActive ? "bg-base-100 text-base-content shadow-sm" : disabled ? "text-base-content/20 cursor-not-allowed" : "text-base-content/50 hover:text-base-content hover:bg-base-100/50"}`}>
-                <Icon size={13} />
+              <button key={tabItem.key} onClick={() => !disabled && setTab(tabItem.key)} disabled={disabled} title={tabItem.key === "editor" && disabled ? t("app.editorDisabled") : tabItem.key === "quiz" && disabled ? t("app.quizDisabled") : undefined} className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-md text-xs font-medium whitespace-nowrap transition-colors duration-150 cursor-pointer ${isActive ? "bg-accent text-accent-foreground" : disabled ? "text-muted/40 cursor-not-allowed" : "text-muted hover:text-foreground hover:bg-surface-tertiary"}`}>
+                <Icon size={14} weight={isActive ? "fill" : "regular"} />
                 {tabItem.label}
               </button>
             );
           })}
-        </div>
+        </nav>
 
-        <div className="flex items-center gap-1">
-          <button className="btn btn-ghost btn-sm btn-circle" onClick={() => setShowSettings(true)}>
-            <Settings size={16} />
-          </button>
-        </div>
-      </div>
+        <Button isIconOnly variant="ghost" aria-label="Settings" onPress={() => setShowSettings(true)} className="text-muted hover:text-foreground">
+          <Gear size={18} weight="regular" />
+        </Button>
+      </header>
 
       {/* Main content */}
       <div className="flex flex-1 overflow-hidden">

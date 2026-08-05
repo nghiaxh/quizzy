@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuizStore } from "../store/quizStore";
-import { ChevronLeft, ChevronRight, CheckSquare, Timer, RefreshCw } from "lucide-react";
+import { Button } from "@heroui/react";
+import { ArrowsClockwise, CaretLeft, CaretRight, CheckSquare, Timer } from "@phosphor-icons/react";
 import { useTranslation } from "../i18n/useTranslation";
 import { motion } from "framer-motion";
 
@@ -15,11 +16,8 @@ function formatTime(s: number) {
 function EmptyState() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-3 text-base-content/30">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="8" y="2" width="8" height="4" rx="1" />
-        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
-      </svg>
+    <div className="flex flex-1 flex-col items-center justify-center gap-3 text-muted/40">
+      <Timer size={40} />
       <p className="text-sm font-medium">{t("quiz.emptyTitle")}</p>
       <p className="text-xs">{t("quiz.emptyDesc")}</p>
     </div>
@@ -107,77 +105,73 @@ export default function Quiz() {
 
   const getOptionStyle = (i: number) => {
     if (!isSubmitted) {
-      if (chosen === i) return "border-primary bg-primary/10 text-primary shadow-sm";
-      return "border-base-300 hover:border-primary/40 hover:bg-base-200/80";
+      if (chosen === i) return "border-accent bg-accent/10";
+      return "border-border hover:border-accent/50 hover:bg-surface-secondary";
     }
-    if (i === q.correctIndex) return "border-success bg-success/10 text-success";
-    if (chosen === i) return "border-error bg-error/10 text-error";
-    return "border-base-300 opacity-30 cursor-default";
+    if (i === q.correctIndex) return "border-success bg-success/10";
+    if (chosen === i) return "border-danger bg-danger/10";
+    return "border-border opacity-30 cursor-default";
   };
 
-  const getCircleStyle = (i: number) => {
+  const getBadgeStyle = (i: number) => {
     if (!isSubmitted) {
-      if (chosen === i) return "bg-primary text-white border-primary";
-      return "border-base-300 text-base-content/30";
+      if (chosen === i) return "bg-accent text-accent-foreground border-accent";
+      return "bg-surface-tertiary text-muted border-border";
     }
     if (i === q.correctIndex) return "bg-success text-white border-success";
-    if (chosen === i) return "bg-error text-white border-error";
-    return "border-base-300 text-base-content/20";
+    if (chosen === i) return "bg-danger text-white border-danger";
+    return "bg-surface-tertiary text-muted/40 border-border";
+  };
+
+  const getTextStyle = (i: number) => {
+    if (!isSubmitted) return "text-foreground";
+    if (i === q.correctIndex) return "text-success";
+    if (chosen === i) return "text-danger";
+    return "text-muted/40";
   };
 
   return (
-    <div className="flex flex-col flex-1 overflow-hidden">
-      <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-base-300 bg-base-100">
-        <div className="flex items-center gap-1 sm:gap-2">
+    <div className="flex flex-col flex-1 overflow-hidden bg-background">
+      <div className="flex items-center justify-between px-4 sm:px-5 py-2.5 border-b border-separator bg-surface">
+        <div className="flex items-center gap-2">
           {isRedoMode && (
-            <span className="badge badge-warning badge-sm gap-1 text-[10px]">
-              <RefreshCw size={10} />
+            <span className="inline-flex items-center gap-1 rounded-lg bg-warning/15 text-warning border border-warning/25 px-2 py-0.5 font-mono text-[10px]">
+              <ArrowsClockwise size={11} weight="bold" />
               {t("quiz.redoBadge")}
             </span>
           )}
           {timeLeft !== null && (
-            <span className={`flex items-center gap-1 text-sm font-medium ${timeLeft <= 60 ? "text-error" : "text-base-content/60"}`}>
+            <span className={`flex items-center gap-1 font-mono text-sm ${timeLeft <= 60 ? "text-danger" : "text-muted"}`}>
               <Timer size={14} />
               {formatTime(timeLeft)}
             </span>
           )}
         </div>
-        <span className="text-sm font-medium text-base-content/40">
+        <span className="font-mono text-sm text-muted">
           {currentIndex + 1}
-          <span className="text-base-content/50"> / {questions.length}</span>
+          <span className="text-muted/50"> / {questions.length}</span>
         </span>
         <div />
       </div>
 
-      <div className="h-0.5 bg-base-200">
-        <motion.div
-          className="h-0.5 bg-primary"
-          animate={{ width: `${progressPct}%` }}
-          transition={{ duration: 0.3 }}
-        />
+      <div className="h-0.5 bg-surface-tertiary">
+        <motion.div className="h-0.5 bg-accent" animate={{ width: `${progressPct}%` }} transition={{ duration: 0.3 }} />
       </div>
 
       <div className="flex-1 overflow-y-auto flex flex-col items-center px-6 py-8">
         <div className="w-full max-w-xl">
-          <motion.div
-            key={q.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <p className="text-lg font-semibold leading-relaxed text-base-content mb-8 text-center sm:text-left whitespace-pre-line">{q.text}</p>
+          <motion.div key={q.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}>
+            <p className="text-lg font-serif leading-relaxed text-foreground mb-8 text-center sm:text-left whitespace-pre-line">{q.text}</p>
 
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-2.5">
               {q.options.map((o, i) => (
                 <div
                   key={i}
-                  className={`flex items-center gap-4 px-5 py-4 rounded-2xl border-2 text-sm transition-colors duration-150 ${isSubmitted ? "" : "cursor-pointer"} ${getOptionStyle(i)}`}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-colors duration-150 ${isSubmitted ? "" : "cursor-pointer"} ${getOptionStyle(i)}`}
                   onClick={() => !isSubmitted && selectAnswer(q.id, i, false)}
                 >
-                  <span className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-sm font-bold shrink-0 transition-colors ${getCircleStyle(i)}`}>
-                    {LABELS[i]}
-                  </span>
-                  <span className="flex-1 leading-snug whitespace-pre-line">{o}</span>
+                  <span className={`w-6 h-6 rounded-md border flex items-center justify-center text-xs font-mono font-bold shrink-0 transition-colors ${getBadgeStyle(i)}`}>{LABELS[i]}</span>
+                  <span className={`flex-1 leading-snug whitespace-pre-line ${getTextStyle(i)}`}>{o}</span>
                 </div>
               ))}
             </div>
@@ -185,28 +179,28 @@ export default function Quiz() {
         </div>
       </div>
 
-      <div className="px-6 py-4 border-t border-base-300 bg-base-100">
+      <div className="px-6 py-4 border-t border-separator bg-surface">
         <div className="flex items-center justify-center gap-3">
-          <button className="flex items-center gap-2 btn btn-md btn-ghost" onClick={prevQuestion} disabled={currentIndex === 0}>
-            <ChevronLeft size={18} />
+          <Button variant="ghost" size="md" isDisabled={currentIndex === 0} onPress={prevQuestion}>
+            <CaretLeft size={16} weight="bold" />
             {t("quiz.prev")}
-          </button>
+          </Button>
 
           {!isSubmitted ? (
-            <button className={`flex items-center gap-2 btn btn-md transition-all ${hasChosen ? "btn-primary" : "btn-disabled bg-base-200 text-base-content/25 border-base-200"}`} onClick={() => hasChosen && selectAnswer(q.id, chosen, true)} disabled={!hasChosen}>
-              <CheckSquare size={17} />
+            <Button variant="primary" size="md" isDisabled={!hasChosen} onPress={() => hasChosen && selectAnswer(q.id, chosen, true)}>
+              <CheckSquare size={16} weight="bold" />
               {t("quiz.check")}
-            </button>
+            </Button>
           ) : isLast ? (
-            <button className={`flex items-center gap-2 btn btn-md ${allSubmitted ? "btn-primary" : "btn-disabled opacity-40"}`} onClick={nextQuestion} disabled={!allSubmitted}>
+            <Button variant="primary" size="md" isDisabled={!allSubmitted} onPress={nextQuestion}>
               {t("quiz.viewResult")}
-              <ChevronRight size={17} />
-            </button>
+              <CaretRight size={16} weight="bold" />
+            </Button>
           ) : (
-            <button className="flex items-center gap-2 btn btn-md btn-outline btn-success" onClick={nextQuestion}>
+            <Button variant="secondary" size="md" onPress={nextQuestion}>
               {t("quiz.next")}
-              <ChevronRight size={17} />
-            </button>
+              <CaretRight size={16} weight="bold" />
+            </Button>
           )}
         </div>
       </div>

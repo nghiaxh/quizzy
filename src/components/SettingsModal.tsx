@@ -1,7 +1,10 @@
-import { Settings, X, Sun, Moon } from "lucide-react";
+import { Input, Modal, Switch } from "@heroui/react";
+import { CaretDown, Moon, Sun } from "@phosphor-icons/react";
 import { useQuizStore } from "../store/quizStore";
 import { useTranslation } from "../i18n/useTranslation";
+import AppModal from "./AppModal";
 import type { Language } from "../i18n/translations";
+import type { ReactNode } from "react";
 
 interface SettingsModalProps {
   theme: "light" | "dark";
@@ -9,104 +12,149 @@ interface SettingsModalProps {
   onClose: () => void;
 }
 
+function SettingRow({ label, desc, children }: { label: string; desc: string; children: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-3.5">
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-foreground">{label}</p>
+        <p className="text-xs text-muted mt-0.5">{desc}</p>
+      </div>
+      <div className="shrink-0">{children}</div>
+    </div>
+  );
+}
+
 export default function SettingsModal({ theme, setTheme, onClose }: SettingsModalProps) {
-  const { shuffleQuestions, setShuffleQuestions, soundEnabled, setSoundEnabled, effectsEnabled, setEffectsEnabled, timerEnabled, setTimerEnabled, timerMinutes, setTimerMinutes, language, setLanguage } = useQuizStore();
+  const {
+    shuffleQuestions,
+    setShuffleQuestions,
+    soundEnabled,
+    setSoundEnabled,
+    effectsEnabled,
+    setEffectsEnabled,
+    timerEnabled,
+    setTimerEnabled,
+    timerMinutes,
+    setTimerMinutes,
+    language,
+    setLanguage,
+  } = useQuizStore();
   const { t } = useTranslation();
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative z-10 bg-base-100 border border-base-300 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-sm max-h-[85vh] flex flex-col overflow-hidden">
+    <AppModal onClose={onClose}>
+      <Modal.Backdrop isDismissable>
+        <Modal.Container size="sm">
+          <Modal.Dialog className="max-h-[85vh]">
+            <Modal.Header>
+              <Modal.Heading className="font-serif text-xl tracking-tight">{t("settings.title")}</Modal.Heading>
+              <Modal.CloseTrigger onPress={onClose} />
+            </Modal.Header>
 
-        <div className="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-base-300 sticky top-0 bg-base-100 z-10">
-          <div className="flex items-center gap-2">
-            <Settings size={15} className="text-primary" />
-            <span className="font-semibold text-sm">{t("settings.title")}</span>
-          </div>
-          <button className="btn btn-ghost btn-sm btn-square" onClick={onClose}>
-            <X size={14} />
-          </button>
-        </div>
+            <Modal.Body className="px-6 divide-y divide-separator">
+              <SettingRow label={t("settings.theme.label")} desc={t("settings.theme.desc")}>
+                <div className="flex items-center gap-0.5 p-0.5 rounded-lg bg-surface-secondary border border-border">
+                  <button
+                    onClick={() => setTheme("light")}
+                    aria-pressed={theme === "light"}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors duration-150 ${
+                      theme === "light" ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <Sun size={13} weight={theme === "light" ? "fill" : "regular"} />
+                    {t("settings.theme.light")}
+                  </button>
+                  <button
+                    onClick={() => setTheme("dark")}
+                    aria-pressed={theme === "dark"}
+                    className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-colors duration-150 ${
+                      theme === "dark" ? "bg-accent text-accent-foreground" : "text-muted hover:text-foreground"
+                    }`}
+                  >
+                    <Moon size={13} weight={theme === "dark" ? "fill" : "regular"} />
+                    {t("settings.theme.dark")}
+                  </button>
+                </div>
+              </SettingRow>
 
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 overscroll-contain">
+              <SettingRow label={t("settings.shuffle.label")} desc={t("settings.shuffle.desc")}>
+                <Switch isSelected={shuffleQuestions} onChange={setShuffleQuestions} size="sm" aria-label={t("settings.shuffle.label")}>
+                  <Switch.Content>
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                  </Switch.Content>
+                </Switch>
+              </SettingRow>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t("settings.theme.label")}</p>
-              <p className="text-xs text-base-content/40">{t("settings.theme.desc")}</p>
-            </div>
-            <div className="flex items-center bg-base-200 rounded-lg p-0.5">
-              <button onClick={() => setTheme("light")} className={`cursor-pointer flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${theme === "light" ? "bg-base-100 text-base-content shadow-sm" : "text-base-content/40 hover:text-base-content"}`}>
-                <Sun size={13} /> {t("settings.theme.light")}
-              </button>
-              <button onClick={() => setTheme("dark")} className={`cursor-pointer flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium transition-all ${theme === "dark" ? "bg-base-100 text-base-content shadow-sm" : "text-base-content/40 hover:text-base-content"}`}>
-                <Moon size={13} /> {t("settings.theme.dark")}
-              </button>
-            </div>
-          </div>
+              <SettingRow label={t("settings.sound.label")} desc={t("settings.sound.desc")}>
+                <Switch isSelected={soundEnabled} onChange={setSoundEnabled} size="sm" aria-label={t("settings.sound.label")}>
+                  <Switch.Content>
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                  </Switch.Content>
+                </Switch>
+              </SettingRow>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t("settings.shuffle.label")}</p>
-              <p className="text-xs text-base-content/40">{t("settings.shuffle.desc")}</p>
-            </div>
-            <input type="checkbox" className="toggle toggle-primary" checked={shuffleQuestions} onChange={(e) => setShuffleQuestions(e.target.checked)} />
-          </div>
+              <SettingRow label={t("settings.effects.label")} desc={t("settings.effects.desc")}>
+                <Switch isSelected={effectsEnabled} onChange={setEffectsEnabled} size="sm" aria-label={t("settings.effects.label")}>
+                  <Switch.Content>
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                  </Switch.Content>
+                </Switch>
+              </SettingRow>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t("settings.sound.label")}</p>
-              <p className="text-xs text-base-content/40">{t("settings.sound.desc")}</p>
-            </div>
-            <input type="checkbox" className="toggle toggle-primary" checked={soundEnabled} onChange={(e) => setSoundEnabled(e.target.checked)} />
-          </div>
+              <SettingRow label={t("settings.timer.label")} desc={t("settings.timer.desc")}>
+                <Switch isSelected={timerEnabled} onChange={setTimerEnabled} size="sm" aria-label={t("settings.timer.label")}>
+                  <Switch.Content>
+                    <Switch.Control>
+                      <Switch.Thumb />
+                    </Switch.Control>
+                  </Switch.Content>
+                </Switch>
+              </SettingRow>
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t("settings.effects.label")}</p>
-              <p className="text-xs text-base-content/40">{t("settings.effects.desc")}</p>
-            </div>
-            <input type="checkbox" className="toggle toggle-primary" checked={effectsEnabled} onChange={(e) => setEffectsEnabled(e.target.checked)} />
-          </div>
+              {timerEnabled && (
+                <SettingRow label={t("settings.time.label")} desc={t("settings.time.desc")}>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={1}
+                      max={180}
+                      value={timerMinutes}
+                      onChange={(e) => setTimerMinutes(Math.max(1, parseInt(e.target.value) || 1))}
+                      aria-label={t("settings.time.label")}
+                      className="w-20 text-center"
+                    />
+                    <span className="text-xs text-muted">{t("settings.time.unit")}</span>
+                  </div>
+                </SettingRow>
+              )}
 
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium">{t("settings.timer.label")}</p>
-              <p className="text-xs text-base-content/40">{t("settings.timer.desc")}</p>
-            </div>
-            <input type="checkbox" className="toggle toggle-primary" checked={timerEnabled} onChange={(e) => setTimerEnabled(e.target.checked)} />
-          </div>
+              <SettingRow label={t("settings.language.label")} desc={t("settings.language.desc")}>
+                <div className="relative">
+                  <select
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as Language)}
+                    className="h-9 min-w-28 appearance-none rounded-field bg-field pr-8 pl-3 text-sm text-field-foreground border border-field-border outline-none cursor-pointer focus:border-field-border-focus"
+                  >
+                    <option value="en">English</option>
+                    <option value="vi">Tiếng Việt</option>
+                  </select>
+                  <CaretDown size={12} weight="bold" className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted pointer-events-none" />
+                </div>
+              </SettingRow>
+            </Modal.Body>
 
-          {timerEnabled && (
-            <div className="flex items-center justify-between pl-3 border-l-2 border-primary/30">
-              <div>
-                <p className="text-sm font-medium">{t("settings.time.label")}</p>
-                <p className="text-xs text-base-content/40">{t("settings.time.desc")}</p>
-              </div>
-              <div className="flex items-center gap-1">
-                <input type="number" className="input input-sm input-bordered w-16 text-center" min={1} max={180} value={timerMinutes} onChange={(e) => setTimerMinutes(Math.max(1, parseInt(e.target.value) || 1))} />
-                <span className="text-xs text-base-content/40">{t("settings.time.unit")}</span>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-between border-t border-base-300 pt-3">
-            <div>
-              <p className="text-sm font-medium">{t("settings.language.label")}</p>
-              <p className="text-xs text-base-content/40">{t("settings.language.desc")}</p>
-            </div>
-            <select className="select select-sm select-bordered w-24" value={language} onChange={(e) => setLanguage(e.target.value as Language)}>
-              <option value="en">English</option>
-              <option value="vi">Tiếng Việt</option>
-            </select>
-          </div>
-
-        </div>
-
-        <div className="flex justify-center text-xs text-base-content/40 py-3">
-          <span>Quizzy 0.5.0 by Nghia Hoang</span>
-        </div>
-      </div>
-    </div>
+            <Modal.Footer className="justify-center">
+              <span className="text-xs text-muted">Quizzy 0.5.0 by Nghia Hoang</span>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+    </AppModal>
   );
 }
