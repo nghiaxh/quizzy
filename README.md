@@ -1,5 +1,12 @@
 # Quizzy
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-ready-5A0FC8?logo=pwa&logoColor=white)
+![Vitest](https://img.shields.io/badge/Vitest-tested-6DA55F?logo=vitest&logoColor=white)
+
 A browser-based multiple choice exam tool.
 
 ## Workflow
@@ -24,7 +31,7 @@ Exams --> Editor --> Quiz --> Result --> Review
 - **Timed mode.** Optional per-quiz countdown with auto-submit on expiry.
 - **Redo incorrect.** Retry only the quiz questions you got wrong.
 - **Export and Import JSON.** Share exams as portable JSON files.
-- **Share link.** Generate compressed URL with exam data embedded — no backend needed.
+- **Share link.** Generate compressed URL with exam data embedded, no backend needed.
 - **Accessibility.** Keyboard-navigable, screen-reader friendly controls.
 - **PWA.** Installable as a standalone app with offline support.
 - **Light and Dark** theme with warm editorial monochrome tokens (HeroUI CSS-first).
